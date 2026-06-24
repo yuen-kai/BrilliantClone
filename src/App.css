@@ -1,0 +1,74 @@
+.app-shell {
+  min-height: 100svh;
+}
+
+.lesson-page {
+  max-width: min(1100px, 92vw);
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  box-sizing: border-box;
+}
+
+.lesson-page > p {
+  text-align: center;
+  padding: 64px 0;
+  color: var(--text);
+}
+
+.lesson-page__back {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.lesson-page__back:hover {
+  text-decoration: underline;
+}
+
+/* Dev-only level picker (fixed so it's always reachable while testing) */
+.dev-level-picker {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px dashed var(--spark);
+  border-radius: 999px;
+  box-shadow: var(--shadow-md);
+}
+
+.dev-level-picker__tag {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--spark);
+  border: 1px solid var(--spark);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.dev-level-picker label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dev-level-picker select {
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  cursor: pointer;
+}

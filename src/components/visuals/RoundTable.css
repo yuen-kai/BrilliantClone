@@ -1,0 +1,130 @@
+.round-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.round-table__stage {
+  position: relative;
+  width: 232px;
+  height: 232px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Fixed marker so the spin is obviously a rotation, not a reshuffle. */
+.round-table__head {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 11px solid var(--accent);
+  z-index: 3;
+}
+
+.round-table__ring {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.34, 1.1, 0.5, 1);
+}
+
+/* The table surface */
+.round-table__top {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 116px;
+  height: 116px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, var(--surface), var(--paper));
+  border: 2px solid var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.round-table__seat {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -26px 0 0 -26px;
+  width: 52px;
+  height: 52px;
+}
+
+.round-table__person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 52px;
+  transition: transform 0.7s cubic-bezier(0.34, 1.1, 0.5, 1);
+}
+
+.round-table__emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.round-table__name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.round-table__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.round-table__btn {
+  padding: 9px 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: var(--display);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.round-table__btn:hover {
+  filter: brightness(1.08);
+}
+
+.round-table__btn:active {
+  transform: translateY(1px);
+}
+
+.round-table__count {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.round-table__count.is-looped {
+  color: var(--grow);
+}
+
+.round-table__note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text);
+  max-width: 340px;
+}

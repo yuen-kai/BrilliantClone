@@ -1,0 +1,67 @@
+.gate-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.gate-input__label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-h);
+  text-align: left;
+}
+
+.gate-input__row {
+  display: flex;
+  gap: 8px;
+}
+
+.gate-input__field {
+  flex: 1;
+  min-height: 48px;
+  padding: 10px 14px;
+  font-size: 1.05rem;
+  font-family: var(--mono);
+  font-weight: 700;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-h);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.gate-input__field:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.gate-input__submit {
+  min-height: 48px;
+  min-width: 80px;
+  padding: 10px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--display);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.gate-input__submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.gate-input__submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gate-input__submit:not(:disabled):active {
+  transform: translateY(1px);
+}

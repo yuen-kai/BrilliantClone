@@ -1,0 +1,326 @@
+.visual-step {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.visual-step__prompt {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  text-align: left;
+  margin: 0;
+}
+
+/* Tree + running-count ledger, side by side on wide screens */
+.visual-step__stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 18px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.visual-step__stage .tree-build {
+  flex: 1 1 320px;
+}
+
+/* ---- Count rail: the multiplication made visible as a vertical chain ---- */
+.count-rail-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 168px;
+  flex: 0 1 200px;
+}
+
+.count-rail__caption {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.count-rail {
+  list-style: none;
+  margin: 0;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.count-rail__step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.count-rail__step--start,
+.count-rail__step.is-confirmed {
+  color: var(--text-h);
+}
+
+.count-rail__step.is-confirmed {
+  border-color: var(--grow-border);
+}
+
+.count-rail__step.is-current {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent-ink);
+}
+
+.count-rail__step.is-counting {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.count-rail__label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.count-rail__name {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Running product (e.g. "3 × 2") that makes the cumulative total explicit */
+.count-rail__expr {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.count-rail__total {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-h);
+  min-width: 1.5ch;
+  text-align: right;
+}
+
+.count-rail__step.is-confirmed .count-rail__total {
+  color: var(--grow);
+}
+
+.count-rail__total--pending {
+  color: var(--accent);
+}
+
+.count-rail__step.is-current .count-rail__total--pending {
+  animation: railBlink 1s steps(2, start) infinite;
+}
+
+@keyframes railBlink {
+  to {
+    opacity: 0.3;
+  }
+}
+
+/* Connector between two totals, carrying that level's multiplier */
+.count-rail__op {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+}
+
+.count-rail__op::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--border-strong);
+}
+
+.count-rail__op span {
+  position: relative;
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  padding: 1px 7px;
+  border-radius: 999px;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.count-rail__op.is-shown span {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.count-rail__input-form {
+  display: flex;
+  gap: 6px;
+}
+
+.count-rail__input {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 8px;
+  font-family: var(--mono);
+  font-size: 1rem;
+  text-align: center;
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-h);
+}
+
+.count-rail__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.count-rail__check {
+  flex: 0 0 auto;
+  width: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.count-rail__check:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.count-rail__check:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.count-rail__check:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visual-step__hint {
+  font-size: 0.85rem;
+  color: var(--text);
+  text-align: left;
+  margin: 0;
+}
+
+/* Plain-language key explaining what the nodes and totals mean */
+.visual-step__legend {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.visual-step__legend strong {
+  color: var(--text-h);
+}
+
+.visual-step__legend-dot {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2.5px solid var(--accent);
+  box-sizing: border-box;
+}
+
+/* ---- Controls ---- */
+.visual-step__controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 480px;
+  align-self: center;
+}
+
+.visual-step__next-btn {
+  min-height: 50px;
+  padding: 13px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--display);
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.visual-step__next-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.visual-step__next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visual-step__next-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 520px) {
+  .visual-step__stage {
+    flex-direction: column;
+  }
+
+  .count-rail-wrap {
+    width: 100%;
+    flex-basis: auto;
+  }
+}

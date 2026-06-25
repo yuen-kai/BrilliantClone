@@ -1,14 +1,21 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { seedDemoProgress } from '../hooks/useLessonProgress'
 import { isBenignPopupClosure } from '../lib/googleAuth'
 import './LoginPage.css'
 
 export function LoginPage() {
-  const { logIn, signUp, logInWithGoogle, user, isConfigured } = useAuth()
+  const { logIn, signUp, logInWithGoogle, user, isConfigured, enterDemo } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/'
+
+  const handleDemo = () => {
+    seedDemoProgress()
+    enterDemo()
+    navigate('/course', { replace: true })
+  }
 
   const [mode, setMode] = useState<'login' | 'signup'>('login')
   const [name, setName] = useState('')
@@ -30,6 +37,10 @@ export function LoginPage() {
             Firebase isn't configured. Add credentials to <code>.env.local</code>, or jump straight
             in.
           </p>
+          <button type="button" className="login-page__demo" onClick={handleDemo}>
+            Explore the demo
+            <span className="login-page__demo-note">All lessons unlocked</span>
+          </button>
           <Link to="/" className="login-page__submit">
             Continue without an account
           </Link>
@@ -90,6 +101,16 @@ export function LoginPage() {
             ? 'Build your first decision tree in two minutes.'
             : 'Pick up your streak where you left off.'}
         </p>
+
+      <button
+        type="button"
+        className="login-page__demo"
+        onClick={handleDemo}
+        disabled={submitting}
+      >
+        Explore the demo
+        <span className="login-page__demo-note">All lessons unlocked · no account</span>
+      </button>
 
       <button
         type="button"

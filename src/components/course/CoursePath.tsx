@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { courseLessons } from '../../content/course'
 import { availableLessonIds } from '../../content/lessons'
-import { useAllLessonProgress } from '../../hooks/useLessonProgress'
+import { useAllLessonProgress, clearDemoProgress } from '../../hooks/useLessonProgress'
 import { useAuth } from '../../context/AuthContext'
 import './CoursePath.css'
 
@@ -36,8 +36,13 @@ function buildCurve(points: { x: number; y: number }[]): string {
 }
 
 export function CoursePath() {
-  const { displayName, logOut, isConfigured, user } = useAuth()
+  const { displayName, logOut, isConfigured, user, demoMode } = useAuth()
   const { progressMap, streak, loading } = useAllLessonProgress()
+
+  const handleExit = () => {
+    if (demoMode) clearDemoProgress()
+    void logOut()
+  }
 
   const recommendedId = courseLessons.find(
     (l) => isLessonUnlocked(l.id, progressMap) && progressMap[l.id]?.mastered !== true,
@@ -95,9 +100,9 @@ export function CoursePath() {
       <aside className="course-card">
         <div className="course-card__top">
           <BrandMark />
-          {isConfigured && user && (
-            <button type="button" className="course-path__logout" onClick={() => logOut()}>
-              Log out
+          {((isConfigured && user) || demoMode) && (
+            <button type="button" className="course-path__logout" onClick={handleExit}>
+              {demoMode ? 'Exit demo' : 'Log out'}
             </button>
           )}
         </div>

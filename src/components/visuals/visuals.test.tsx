@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RoundTable } from './RoundTable'
-import { ComplementDots } from './ComplementDots'
+import { ComplementTree } from './ComplementTree'
 
 describe('RoundTable', () => {
   const seats = [
@@ -30,16 +30,27 @@ describe('RoundTable', () => {
   })
 })
 
-describe('ComplementDots', () => {
-  it('toggles the unwanted set and shows the subtraction', async () => {
-    const user = userEvent.setup()
-    render(
-      <ComplementDots total={8} unwanted={1} wantedLabel="have a head" unwantedLabel="all-tails" />,
-    )
+describe('ComplementTree', () => {
+  const config = {
+    rootLabel: '8 sequences',
+    branches: [
+      { id: 'h0', label: '0 heads', count: 1, wanted: false },
+      { id: 'h1', label: '1 head', count: 3, wanted: true },
+      { id: 'h2', label: '2 heads', count: 3, wanted: true },
+      { id: 'h3', label: '3 heads', count: 1, wanted: true },
+    ],
+  }
 
-    expect(screen.getByText(/8 total/)).toBeTruthy()
-    const btn = screen.getByRole('button', { name: /cross out the all-tails/i })
-    await user.click(btn)
-    expect(screen.getByRole('button', { name: /bring them back/i })).toBeTruthy()
+  it('toggles strategy without revealing the summed answer', async () => {
+    const user = userEvent.setup()
+    render(<ComplementTree config={config} />)
+
+    // Shows the per-branch structure but never prints the final sum (7).
+    expect(screen.getByText('0 heads')).toBeTruthy()
+    expect(screen.queryByText(/=\s*7/)).toBeNull()
+    expect(screen.queryByText(/\b7\b/)).toBeNull()
+
+    await user.click(screen.getByRole('button', { name: /use the complement/i }))
+    await user.click(screen.getByRole('button', { name: /count directly/i }))
   })
 })

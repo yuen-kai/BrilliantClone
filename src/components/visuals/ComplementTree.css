@@ -1,0 +1,286 @@
+.ctree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.ctree__canvas {
+  width: 100%;
+  max-width: 564px;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* The "whole body" you cut from. In complement mode this becomes a calm blue
+ * rounded outline + faint wash around the entire tree — the "everything is
+ * selected" frame the learner starts from before removing one branch. */
+.ctree__wash {
+  fill: var(--sky);
+  fill-opacity: 0;
+  stroke: var(--sky);
+  stroke-width: 2;
+  stroke-opacity: 0;
+  transition: fill-opacity 0.8s ease, stroke-opacity 0.8s ease;
+}
+
+.ctree--complement .ctree__wash {
+  fill-opacity: 0.07;
+  stroke-opacity: 0.85;
+}
+
+.ctree__edge {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke 0.8s ease, stroke-width 0.8s ease, opacity 0.8s ease;
+}
+
+.ctree__edge.is-add {
+  stroke: var(--sun);
+}
+
+.ctree__edge.is-subtract {
+  stroke: var(--ember);
+  stroke-width: 2.4;
+}
+
+.ctree__edge.is-recede {
+  opacity: 0.32;
+}
+
+/* Kept branches in complement mode stay inside the blue "whole" — a calm sky
+ * edge rather than a faded-out one. */
+.ctree--complement .ctree__edge.is-recede {
+  stroke: var(--sky-border);
+  opacity: 0.85;
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+ * Nodes read like a clean blueprint selection: a faint translucent fill + a
+ * crisp coloured selection edge in the operation colour. No glow/halo — flat and
+ * crisp, to match the graph-paper aesthetic. Colour is supplied per-op via --edge.
+ * ─────────────────────────────────────────────────────────────────────────── */
+.ctree__root-box,
+.ctree__leaf-box {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  transition: fill 0.8s ease, fill-opacity 0.8s ease, stroke 0.8s ease,
+    stroke-width 0.8s ease;
+}
+
+.ctree__leaf.is-add .ctree__leaf-box,
+.ctree__leaf.is-subtract .ctree__leaf-box,
+.ctree__root.is-subtract-from .ctree__root-box {
+  fill: var(--edge);
+  fill-opacity: 0.1;
+  stroke: var(--edge);
+  stroke-width: 2.5;
+}
+
+.ctree__leaf.is-add .ctree__leaf-box {
+  --edge: var(--sun);
+}
+
+.ctree__leaf.is-subtract .ctree__leaf-box {
+  --edge: var(--ember);
+  fill-opacity: 0.12;
+}
+
+.ctree__root.is-subtract-from .ctree__root-box {
+  --edge: var(--sky);
+}
+
+.ctree__root-label {
+  fill: var(--text-h);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 16px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Structure only — no per-branch counts (those are the gated answers the learner
+ * works out). Each branch shows just its label, centred in the box. */
+.ctree__leaf-label {
+  fill: var(--text-h);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  transition: fill 0.8s ease;
+}
+
+.ctree__leaf.is-subtract .ctree__leaf-label {
+  fill: var(--ember);
+}
+
+/* Receded nodes. Direct mode fades the odd branch right out; complement mode
+ * does NOT fade — kept branches stay legible inside the blue "whole" with a
+ * faint sky tint so they read as part of the selection. */
+.ctree__leaf.is-recede {
+  transition: opacity 0.8s ease;
+}
+
+.ctree--direct .ctree__leaf.is-recede {
+  opacity: 0.38;
+}
+
+.ctree--complement .ctree__leaf.is-recede {
+  opacity: 0.92;
+}
+
+.ctree--complement .ctree__leaf.is-recede .ctree__leaf-box {
+  fill: var(--sky);
+  fill-opacity: 0.05;
+  stroke: var(--sky-border);
+}
+
+/* ── Slow, deliberate state change — no pop, no bounce ────────────────────────
+ * Switching modes eases the selection colours over a long 0.8s transition.
+ * Direct mode lights the "Add" branches one-by-one via a slow per-branch delay
+ * (--w), so gathering many branches feels unhurried and effortful. Complement
+ * mode is a two-beat: the blue whole settles first, then ~0.45s later the single
+ * removed branch turns orange and its minus badge fades in. */
+.ctree--direct .ctree__leaf.is-add .ctree__leaf-box,
+.ctree--direct .ctree__leaf.is-add .ctree__edge.is-add {
+  transition-delay: calc(var(--w, 0) * 120ms);
+}
+
+.ctree--complement .ctree__leaf.is-subtract .ctree__leaf-box,
+.ctree--complement .ctree__leaf.is-subtract .ctree__leaf-label,
+.ctree--complement .ctree__edge.is-subtract {
+  transition-delay: 0.45s;
+}
+
+/* The minus badge on the branch being subtracted — mathematical, not alarming.
+ * It fades in gently after that branch has turned. */
+.ctree__remove {
+  opacity: 0;
+  transition: opacity 0.6s ease 0.75s;
+}
+
+.ctree__leaf.is-subtract .ctree__remove {
+  opacity: 1;
+}
+
+.ctree__remove-dot {
+  fill: var(--ember);
+  opacity: 0.9;
+}
+
+.ctree__remove-x {
+  stroke: var(--surface);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctree__wash,
+  .ctree__edge,
+  .ctree__leaf-box,
+  .ctree__root-box,
+  .ctree__leaf-label,
+  .ctree__leaf.is-recede,
+  .ctree__remove {
+    transition: none;
+  }
+  .ctree--direct .ctree__leaf.is-add .ctree__leaf-box,
+  .ctree--direct .ctree__leaf.is-add .ctree__edge.is-add,
+  .ctree--complement .ctree__leaf.is-subtract .ctree__leaf-box,
+  .ctree--complement .ctree__leaf.is-subtract .ctree__leaf-label,
+  .ctree--complement .ctree__leaf.is-subtract .ctree__edge.is-subtract {
+    transition-delay: 0s;
+  }
+}
+
+.ctree__toggle {
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.ctree__tab {
+  padding: 6px 14px;
+  font-family: var(--display);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Active tab borrows the mode's own colour so the toggle and tree read as one
+ * idea. A tinted fill + on-tone text stays legible in both light and dark. */
+.ctree--direct .ctree__tab.is-active {
+  background: var(--sun-bg);
+  color: var(--sun);
+}
+
+.ctree--complement .ctree__tab.is-active {
+  background: var(--sky-bg);
+  color: var(--sky);
+}
+
+.ctree__caption {
+  margin: 0;
+  max-width: 380px;
+  text-align: center;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.ctree__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+}
+
+.ctree__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Each swatch mirrors a selected node: faint fill + crisp coloured edge. */
+.ctree__key::before {
+  content: '';
+  width: 13px;
+  height: 11px;
+  border-radius: 3px;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+}
+
+.ctree__key--add::before {
+  border-color: var(--sun);
+  background: var(--sun-bg);
+}
+
+.ctree__key--from::before {
+  border-color: var(--sky);
+  background: var(--sky-bg);
+}
+
+.ctree__key--subtract::before {
+  border-color: var(--ember);
+  background: var(--ember-bg);
+}

@@ -41,7 +41,8 @@ describe('SlotSelectStepView', () => {
     await user.type(screen.getByLabelText(/available for Gold/i), '2')
     await user.click(screen.getByRole('button', { name: 'Check' }))
 
-    expect(screen.getByText('One racer is placed each round.')).toBeTruthy()
+    // Wrong answers now surface the hint (a nudge), not the explanatory "wrong" text.
+    expect(screen.getByText(/count what is left in the pool/i)).toBeTruthy()
     expect(screen.getByLabelText(/available for Gold/i)).toBeTruthy()
   })
 

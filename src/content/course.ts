@@ -21,13 +21,13 @@ export const courseLessons: CourseLesson[] = [
   },
   {
     id: 'lesson-4',
-    title: 'Complementary Counting',
+    title: 'Casework',
     order: 4,
     prerequisiteLessonId: 'lesson-3',
   },
   {
     id: 'lesson-5',
-    title: 'Casework',
+    title: 'Complementary Counting',
     order: 5,
     prerequisiteLessonId: 'lesson-4',
   },

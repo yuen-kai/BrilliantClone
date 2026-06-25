@@ -14,7 +14,7 @@ export function LessonPage() {
     return (
       <div className="lesson-page">
         <p>Lesson not found.</p>
-        {isLayerActive(4) && <Link to="/">Back to course</Link>}
+        {isLayerActive(4) && <Link to="/course">Back to course</Link>}
       </div>
     )
   }

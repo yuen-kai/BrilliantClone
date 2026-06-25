@@ -1,0 +1,274 @@
+.ebuild {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.ebuild__prompt {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+}
+
+.ebuild__visual {
+  display: flex;
+  justify-content: center;
+  padding: 18px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.ebuild__equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 22px 16px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  color: var(--text-h);
+  transition: border-color 0.25s ease;
+}
+
+.ebuild__equation.is-solved {
+  border-style: solid;
+  border-color: var(--grow-border);
+}
+
+.ebuild__lhs {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.ebuild__fraction {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.ebuild__numer,
+.ebuild__denom {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ebuild__bar {
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.ebuild__fac,
+.ebuild__op,
+.ebuild__paren {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ebuild__op,
+.ebuild__paren {
+  color: var(--text);
+}
+
+/* Stars-and-bars renders a combination C(items + groups − 1, groups − 1) inline,
+   not a stacked fraction. */
+.ebuild__combo {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+}
+
+.ebuild__combo-fn {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.ebuild__combo-arg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ebuild__comma {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  align-self: flex-end;
+  padding: 0 2px 6px;
+}
+
+.ebuild__const {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ebuild__slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 50px;
+  padding: 0 6px;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px dashed var(--border-strong);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+/* When a chip is held, empty slots advertise that they're valid targets. */
+.ebuild__slot.is-droppable {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 0 0 3px var(--accent-border);
+}
+
+.ebuild__slot.is-filled {
+  border-style: solid;
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent-ink);
+}
+
+.ebuild__slot.is-wrong {
+  border-style: solid;
+  border-color: var(--flag);
+  background: var(--flag-bg);
+  color: var(--flag);
+}
+
+.ebuild__slot.is-locked {
+  border-style: solid;
+  border-color: var(--grow);
+  background: var(--grow-bg);
+  color: var(--grow);
+  cursor: default;
+}
+
+.ebuild__palette {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ebuild__chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 116px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+
+.ebuild__chip:active {
+  transform: translateY(1px);
+}
+
+.ebuild__chip.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-border), var(--shadow-sm);
+}
+
+.ebuild__chip-num {
+  font-family: var(--display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.ebuild__chip.is-selected .ebuild__chip-num {
+  color: var(--accent-ink);
+}
+
+.ebuild__chip-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-align: center;
+}
+
+.ebuild__finish {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.ebuild__result {
+  margin: 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--grow);
+}
+
+.ebuild__rule {
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.ebuild__rule strong {
+  font-family: var(--mono);
+  color: var(--text-h);
+}
+
+.ebuild__continue {
+  min-height: 50px;
+  padding: 13px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--display);
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.ebuild__continue:hover {
+  filter: brightness(1.08);
+}
+
+.ebuild__continue:active {
+  transform: translateY(1px);
+}

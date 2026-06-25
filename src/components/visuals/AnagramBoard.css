@@ -1,0 +1,113 @@
+.anagram {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.anagram__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.anagram__options {
+  width: 165px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 10px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.anagram__options-head {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.anagram__options-sub {
+  margin-top: 2px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  color: var(--text);
+}
+
+.anagram__options-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.anagram__option {
+  padding: 4px 6px;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.anagram__option.is-match {
+  color: var(--accent-ink);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.anagram__tiles {
+  display: flex;
+  gap: 10px;
+  padding: 14px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.anagram-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 60px;
+  padding: 0;
+  font-family: var(--display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-h);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.15s,
+    border-color 0.15s, background 0.15s;
+}
+
+.anagram-tile.is-dragging {
+  z-index: 5;
+  cursor: grabbing;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-border), var(--shadow-md);
+}
+
+.anagram__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text);
+}

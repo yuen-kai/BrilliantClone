@@ -2,203 +2,110 @@ import type { Lesson } from '../types/lesson'
 
 export const lesson4: Lesson = {
   id: 'lesson-4',
-  title: 'Complementary Counting',
+  title: 'Casework',
   subject: 'AP Statistics · Combinatorics',
   order: 4,
   prerequisiteLessonId: 'lesson-3',
-  tagline: 'Sometimes the fastest way to count what you want is to count what you don’t.',
+  tagline: 'Big messy count? Split it into clean cases, count each, and add them up.',
   completionMessage:
-    'You’ve got the “at least one” trick: count the total, subtract the cases you don’t want.',
+    'You can break a problem into non-overlapping cases, count each, and add across them.',
   steps: [
     {
-      id: 'step-1-flips',
+      id: 'step-1-lunch',
       step: 1,
-      type: 'visual-interactive',
-      prompt:
-        'You flip a coin 3 times and write down the sequence (like H-T-H). Build the tree of every possible sequence.',
-      visual: {
-        component: 'tree-build',
-        treeConfig: {
-          levels: [
-            { label: 'Flip 1', branchCount: 2 },
-            { label: 'Flip 2', branchCount: 2 },
-            { label: 'Flip 3', branchCount: 2 },
-          ],
+      type: 'casework',
+      prompt: 'Lunch is a burger OR a soup, never both. How many lunches can you build?',
+      parentLabel: 'Lunch',
+      cases: [
+        {
+          id: 'burgers',
+          label: 'Burgers',
+          emoji: '🍔',
+          factors: [3, 2],
+          question: 'Build-your-own burger: 3 patties, 2 cheeses. How many burgers?',
+          correctValue: 6,
+          revealExpression: '3 × 2 = 6',
+          feedbackWrong: {
+            default: 'Inside one burger you pick a patty and a cheese — sequential choices. How do they combine?',
+            specificCases: [
+              { answer: 5, message: 'That’s 3 + 2. Picking a patty then a cheese are sequential choices — how do they combine?' },
+            ],
+          },
         },
-      },
-      gated: true,
-      stages: [
-        { kind: 'node-count', branchCount: 2, expectedNodeCount: 2, multiplierLabel: '×2' },
-        { kind: 'node-count', branchCount: 2, expectedNodeCount: 4, multiplierLabel: '×2' },
-        { kind: 'node-count', branchCount: 2, expectedNodeCount: 8, multiplierLabel: '×2' },
+        {
+          id: 'soups',
+          label: 'Soups',
+          emoji: '🍲',
+          factors: [4],
+          question: 'Soup of the day: pick 1 of 4 soups. How many soup lunches?',
+          correctValue: 4,
+          revealExpression: '4 soups',
+          feedbackWrong: {
+            default: 'No build-your-own here — just the soups. How many are there?',
+            specificCases: [],
+          },
+        },
       ],
-      finalGate: {
-        correctValue: 8,
-        prompt: 'How many different 3-flip sequences are there in total?',
-        hintText: 'Two outcomes per flip, three flips: 2 × 2 × 2.',
+      total: {
+        question: 'A lunch is a burger or a soup, not both. How many lunches in all?',
+        correctValue: 10,
+        revealExpression: '6 + 4 = 10',
         feedbackWrong: {
-          default: 'Multiply the outcomes per flip: 2 × 2 × 2 = 8.',
+          default: 'Could one lunch be both a burger and a soup? If not, how do the two counts come together?',
           specificCases: [
-            { answer: 6, message: 'That’s 2 + 2 + 2. Each flip multiplies the choices: 2 × 2 × 2 = 8.' },
+            {
+              answer: 24,
+              message:
+                'That multiplies the cases — but can one lunch be both? If each is only one case, how should the counts combine?',
+            },
           ],
         },
       },
-      hintText: 'Count the nodes at this level after the split.',
-      feedbackWrong: {
-        default: 'Count the nodes at this level.',
-        specificCases: [],
-      },
     },
     {
-      id: 'step-2-at-least-one',
+      id: 'step-2-rule',
       step: 2,
-      type: 'guided-solve',
-      prompt:
-        'Of those 8 sequences, how many have AT LEAST ONE heads? Listing them is fiddly, so count the opposite instead.',
-      intro: 'The opposite of “at least one heads” is “no heads at all.” That’s much easier to count.',
-      visual: {
-        component: 'complement-dots',
-        total: 8,
-        unwanted: 1,
-        wantedLabel: 'have a head',
-        unwantedLabel: 'all-tails',
-      },
-      resultLabel: 'sequences',
-      blanks: [
-        {
-          id: 'none',
-          label: 'Sequences with NO heads',
-          prompt: 'How many of the 8 sequences have zero heads (every flip is tails)?',
-          correctValue: 1,
-          revealExpression: 'just T-T-T',
-          hintText: 'Only one sequence is all tails: T-T-T.',
-          feedbackWrong: {
-            default: 'There’s exactly one all-tails sequence: T-T-T.',
-            specificCases: [
-              { answer: 3, message: 'Not 3. “No heads” means every flip is tails, and only T-T-T does that. So 1.' },
-            ],
-          },
-        },
-        {
-          id: 'wanted',
-          label: 'At least one heads',
-          prompt: 'So how many sequences have at least one heads? (total 8 − the all-tails one)',
-          correctValue: 7,
-          revealExpression: '8 − 1 = 7',
-          hintText: 'Subtract the unwanted case from the total: 8 − 1.',
-          feedbackWrong: {
-            default: 'Subtract the one all-tails case from the 8 total: 8 − 1 = 7.',
-            specificCases: [
-              { answer: 1, message: 'That’s the all-tails case you’re removing. You want the rest: 8 − 1 = 7.' },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      id: 'step-3-dice',
-      step: 3,
-      type: 'guided-solve',
-      prompt:
-        'You roll two dice. How many of the outcomes show at least one 6? Again, the complement is friendlier.',
-      intro: 'Count the total, then subtract the outcomes with NO 6 at all.',
-      visual: {
-        component: 'complement-dots',
-        total: 36,
-        unwanted: 25,
-        wantedLabel: 'show a 6',
-        unwantedLabel: 'with no 6',
-      },
-      resultLabel: 'outcomes',
-      blanks: [
-        {
-          id: 'total',
-          label: 'Total outcomes',
-          prompt: 'Each die shows 1–6. How many outcomes for two dice? (6 × 6)',
-          correctValue: 36,
-          revealExpression: '6 × 6 = 36',
-          hintText: 'Multiply the faces: 6 × 6.',
-          feedbackWrong: {
-            default: 'Two dice, 6 faces each: 6 × 6 = 36.',
-            specificCases: [
-              { answer: 12, message: 'That’s 6 + 6. The dice are independent choices, so multiply: 6 × 6 = 36.' },
-            ],
-          },
-        },
-        {
-          id: 'none',
-          label: 'Outcomes with NO 6',
-          prompt: 'How many outcomes have no 6 at all? (each die shows one of 1–5: 5 × 5)',
-          correctValue: 25,
-          revealExpression: '5 × 5 = 25',
-          hintText: 'With 6 banned, each die has 5 options: 5 × 5.',
-          feedbackWrong: {
-            default: 'Ban the 6: each die has 5 options, so 5 × 5 = 25.',
-            specificCases: [
-              { answer: 10, message: 'That’s 5 + 5. Each die independently has 5 safe faces: 5 × 5 = 25.' },
-            ],
-          },
-        },
-        {
-          id: 'wanted',
-          label: 'At least one 6',
-          prompt: 'So how many outcomes show at least one 6? (36 − 25)',
-          correctValue: 11,
-          revealExpression: '36 − 25 = 11',
-          hintText: 'Total minus the no-6 outcomes: 36 − 25.',
-          feedbackWrong: {
-            default: 'Subtract the complement: 36 − 25 = 11.',
-            specificCases: [
-              { answer: 25, message: 'That’s the no-6 count. Subtract it from the total: 36 − 25 = 11.' },
-            ],
-          },
-        },
-      ],
-    },
-    {
-      id: 'step-4-rule',
-      step: 4,
       type: 'rule-statement',
       explanation:
-        'Complementary counting: when the thing you want is messy to count, especially “at least one” problems, count the total and subtract the cases you do not want. Wanted = Total − Unwanted.',
-      referenceStepId: 'step-1-flips',
-      overlayExpression: 'Total 2 × 2 × 2 = 8, then 8 − (none) = wanted',
+        'Casework: split the problem into cases that don’t overlap and together cover everything. Count each case on its own, then add the cases. Multiply within, add across. Total = case 1 + case 2 + …',
+      overlayExpression: 'Total = case 1 + case 2 + …',
     },
     {
-      id: 'step-5-cold',
-      step: 5,
+      id: 'step-3-cold',
+      step: 3,
       type: 'cold-problem',
       problems: [
         {
           id: 'problem-a',
           prompt:
-            'You flip a coin 4 times. How many of the possible sequences contain at least one heads?',
-          correctValue: 15,
+            'For an outfit you’ll wear EITHER a dress OR a top-and-bottom combo. You own 3 dresses. For the combo you have 4 tops and 2 bottoms. How many outfits are possible?',
+          correctValue: 11,
           feedbackWrong: {
             default:
-              'Total sequences = 2 × 2 × 2 × 2 = 16. Exactly one (all tails) has no heads, so 16 − 1 = 15.',
+              'Two separate cases: a dress, or a top-and-bottom combo. Count each, and since an outfit is only one case, how do the counts come together?',
             specificCases: [
               {
-                answer: 1,
+                answer: 24,
                 message:
-                  'That’s the single all-tails sequence, the one you subtract. The answer is 16 − 1 = 15.',
+                  'That multiplies everything — but a dress and a top+bottom combo are separate cases. Can one outfit be both? How should separate cases combine?',
               },
-              { answer: 16, message: 'That’s every sequence, including all-tails. Remove that one: 16 − 1 = 15.' },
+              { answer: 9, message: 'Looks like you added the tops and bottoms — but choosing a top then a bottom are sequential choices. How do those combine before you add the dresses?' },
             ],
           },
         },
         {
           id: 'problem-b',
           prompt:
-            'You roll two dice. How many outcomes have at least one die showing an even number?',
-          correctValue: 27,
+            'Lunch is EITHER a soup or a sandwich. There are 3 soups. A sandwich is 4 breads and 3 fillings. How many lunches are possible?',
+          correctValue: 15,
           feedbackWrong: {
             default:
-              'Total = 36. Outcomes with no evens (both dice odd) = 3 × 3 = 9. So 36 − 9 = 27.',
+              'Two cases: soup or sandwich. Count the sandwiches as sequential choices, then ask — can a lunch be both? How do the counts combine?',
             specificCases: [
               {
-                answer: 9,
-                message: 'That’s the all-odd complement. Subtract it from the total: 36 − 9 = 27.',
+                answer: 36,
+                message:
+                  'That multiplies everything — but soup and sandwich are separate cases, and a lunch is only one. How should separate cases combine?',
               },
             ],
           },

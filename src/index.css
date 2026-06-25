@@ -18,12 +18,33 @@
   --grow-bg: #e3f7ee;
   --grow-border: #b5e9d2;
 
+  /* Calm, pastel green for "branches to add" — deliberately NOT the success green
+   * so it doesn't read as a "correct answer". */
+  --sage: #5f9e7e;
+  --sage-bg: #eaf2ed;
+  --sage-border: #cfe3d7;
+
   --flag: #e5484d;
   --flag-bg: #fdeaea;
   --flag-border: #f6c9ca;
 
+  --sky: #2b6fe5;
+  --sky-bg: #e7effd;
+  --sky-border: #c2d6f8;
+
   --spark: #e08600;
   --spark-bg: #fdf0d9;
+
+  /* Complement-tree operation colours: a clean gold "add" and a clean orange
+   * "subtract", saturated to match the rest of the palette and distinct from --sky.
+   * Used for borders/fills/badges; node counts stay ink so they read on white. */
+  --sun: #e0a008;
+  --sun-bg: #fdf2d2;
+  --sun-border: #f0d791;
+
+  --ember: #e8662a;
+  --ember-bg: #fce6d8;
+  --ember-border: #f6c2a0;
 
   --code-bg: #f0f1f8;
 
@@ -46,39 +67,53 @@
   -webkit-font-smoothing: antialiased;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Blueprint at night */
-    --paper: #0d0f1c;
-    --surface: #15182a;
-    --grid: #1d2138;
-    --ink: #f3f3fb;
-    --text: #a3a3bd;
-    --text-h: #f3f3fb;
-    --border: #272c45;
-    --border-strong: #353c5c;
+:root[data-theme='dark'] {
+  /* Blueprint at night */
+  --paper: #0d0f1c;
+  --surface: #15182a;
+  --grid: #1d2138;
+  --ink: #f3f3fb;
+  --text: #a3a3bd;
+  --text-h: #f3f3fb;
+  --border: #272c45;
+  --border-strong: #353c5c;
 
-    --accent: #9b7bff;
-    --accent-ink: #b9a3ff;
-    --accent-bg: #221d40;
-    --accent-border: #3a3168;
+  --accent: #9b7bff;
+  --accent-ink: #b9a3ff;
+  --accent-bg: #221d40;
+  --accent-border: #3a3168;
 
-    --grow: #3ddc97;
-    --grow-bg: #11321f;
-    --grow-border: #1e5238;
+  --grow: #3ddc97;
+  --grow-bg: #11321f;
+  --grow-border: #1e5238;
 
-    --flag: #ff8a8d;
-    --flag-bg: #3a1c1f;
-    --flag-border: #5e2c30;
+  --sage: #7fb89a;
+  --sage-bg: #17241d;
+  --sage-border: #2b4135;
 
-    --spark: #fbbf4c;
-    --spark-bg: #2e2410;
+  --flag: #ff8a8d;
+  --flag-bg: #3a1c1f;
+  --flag-border: #5e2c30;
 
-    --code-bg: #1c2034;
+  --sky: #6aa3ff;
+  --sky-bg: #16233f;
+  --sky-border: #284072;
 
-    --shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 18px 48px -16px rgba(0, 0, 0, 0.7);
-  }
+  --spark: #fbbf4c;
+  --spark-bg: #2e2410;
+
+  --sun: #e8c25c;
+  --sun-bg: #2b2410;
+  --sun-border: #48401e;
+
+  --ember: #f0935a;
+  --ember-bg: #341f0f;
+  --ember-border: #56341f;
+
+  --code-bg: #1c2034;
+
+  --shadow-md: 0 6px 20px -8px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 18px 48px -16px rgba(0, 0, 0, 0.7);
 }
 
 @media (max-width: 1024px) {

@@ -1,0 +1,177 @@
+.classify-step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.classify-step__prompt {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  margin: 0;
+}
+
+/* ---- Running ledger of already-sorted scenarios ---- */
+.classify-step__ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.classify-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  animation: classifyRowIn 0.28s ease-out;
+}
+
+.classify-row__text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.86rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.classify-tag {
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.classify-tag--permutation {
+  color: var(--accent-ink);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.classify-tag--combination {
+  color: var(--sky);
+  background: var(--sky-bg);
+  border-color: var(--sky-border);
+}
+
+/* ---- Active scenario card ---- */
+.classify-step__active {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.classify-step__progress {
+  align-self: center;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.classify-step__scenario {
+  margin: 0;
+  text-align: center;
+  font-size: 1.12rem;
+  line-height: 1.45;
+  color: var(--text-h);
+}
+
+.classify-step__choices {
+  display: flex;
+  gap: 12px;
+}
+
+.classify-choice {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 92px;
+  padding: 14px 12px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  background: var(--paper);
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s, transform 0.16s, box-shadow 0.16s;
+}
+
+.classify-choice:hover {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.classify-choice.is-wrong {
+  border-color: var(--flag-border);
+  background: var(--flag-bg);
+}
+
+.classify-choice__type {
+  font-family: var(--display);
+  font-size: 1.18rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.classify-choice__sub {
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.classify-step__feedback:empty {
+  display: none;
+}
+
+@keyframes classifyRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .classify-row {
+    animation: none;
+  }
+  .classify-choice:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .classify-step__choices {
+    flex-direction: column;
+  }
+}

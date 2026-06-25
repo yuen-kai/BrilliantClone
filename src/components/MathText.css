@@ -1,0 +1,9 @@
+/* KaTeX glyphs use currentColor, so inheriting keeps math legible in light
+ * and dark mode without hardcoding any color. */
+.math-text {
+  color: inherit;
+}
+
+.math-text .katex {
+  color: inherit;
+}

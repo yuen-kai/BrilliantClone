@@ -1,9 +1,27 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Lesson 1 flow', () => {
+  test('landing page links into the course', async ({ page }) => {
+    await page.goto('/')
+
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Learn to count anything.' }),
+    ).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Start the course' })).toHaveAttribute(
+      'href',
+      '/course',
+    )
+  })
+
   test('loads course path and starts lesson on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
+
+    // "/" is the public landing now; the CTA leads into the course path.
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Learn to count anything.' }),
+    ).toBeVisible()
+    await page.getByRole('link', { name: 'Start the course' }).click()
 
     await expect(page.getByRole('heading', { name: 'Counting Strategies' })).toBeVisible()
     await expect(page.getByText('Multiplication Principle')).toBeVisible()
@@ -23,7 +41,7 @@ test.describe('Lesson 1 flow', () => {
     await expect(page.getByLabel('How many nodes at this level?')).toBeVisible()
   })
 
-  test('wrong final answer shows specific feedback for addition mistake', async ({ page }) => {
+  test('wrong final answer shows the hint, not the count', async ({ page }) => {
     test.setTimeout(120000)
     await page.goto('/lesson/lesson-1')
     await page.getByRole('button', { name: 'Start lesson' }).click()
@@ -40,6 +58,7 @@ test.describe('Lesson 1 flow', () => {
     await page.getByLabel('How many total sandwiches').fill('7')
     await page.getByRole('button', { name: 'Check' }).click()
 
-    await expect(page.getByText(/added 2 \+ 3 \+ 2/i)).toBeVisible()
+    // Wrong answers now show only the leading hint — no answer-revealing "wrong" text.
+    await expect(page.getByText(/full path from top to bottom is one sandwich/i)).toBeVisible()
   })
 })

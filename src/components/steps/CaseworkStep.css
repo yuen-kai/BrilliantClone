@@ -1,0 +1,139 @@
+.casework-step {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.casework-step__prompt {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.casework-step__visual {
+  display: flex;
+  justify-content: center;
+  padding: 18px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.casework-step__gates {
+  list-style: none;
+  margin: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.casework-step__gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.casework-step__gate.is-current {
+  flex-direction: column;
+  align-items: stretch;
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.casework-step__gate.is-confirmed {
+  border-color: var(--grow-border);
+}
+
+.casework-step__gate-label {
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.casework-step__gate-active {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.casework-step__gate-prompt {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-h);
+}
+
+.casework-step__gate-solved {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.casework-step__gate-expr {
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.casework-step__gate-value {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--grow);
+}
+
+.casework-step__combine-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.casework-step__combine-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.casework-step__combine {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: var(--display);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.casework-step__combine:hover {
+  filter: brightness(1.08);
+}
+
+.casework-step__combine:active {
+  transform: translateY(1px);
+}

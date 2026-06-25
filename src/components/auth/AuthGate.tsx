@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import type { ReactNode } from 'react'
 
 export function AuthGate({ children }: { children: ReactNode }) {
-  const { user, loading, isConfigured } = useAuth()
+  const { user, loading, isConfigured, demoMode } = useAuth()
   const location = useLocation()
 
   if (loading) {
@@ -14,7 +14,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
     )
   }
 
-  if (!isConfigured) {
+  if (!isConfigured || demoMode) {
     return <>{children}</>
   }
 

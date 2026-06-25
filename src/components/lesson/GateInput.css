@@ -37,6 +37,15 @@
   box-shadow: 0 0 0 3px var(--accent-bg);
 }
 
+/* Error indicator: red field on a wrong answer (kept until the learner edits).
+ * Overrides the focus ring since the field is refocused on error. No text here —
+ * the hint shows in its own banner. */
+.gate-input__field.is-error,
+.gate-input__field.is-error:focus {
+  border-color: var(--flag);
+  box-shadow: 0 0 0 3px var(--flag-bg);
+}
+
 .gate-input__submit {
   min-height: 48px;
   min-width: 80px;
@@ -64,4 +73,21 @@
 
 .gate-input__submit:not(:disabled):active {
   transform: translateY(1px);
+}
+
+/* Live result of a typed expression, e.g. "= 15". */
+.gate-input__preview {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--accent);
+  text-align: left;
+}
+
+/* Shown on submit when an expression can't be read or uses a locked operator. */
+.gate-input__msg {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--flag);
+  text-align: left;
 }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { collection, doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore'
 import { db, isFirebaseConfigured } from '../firebase/config'
 import { computeStreakUpdate } from '../lib/streak'
+import { lessons } from '../content/lessons'
 import type { LessonProgress, Streak } from '../types/lesson'
 import { useAuth } from '../context/AuthContext'
 
@@ -14,6 +15,7 @@ function defaultProgress(): LessonProgress {
     stepAnswers: {},
     mastered: null,
     completedAt: null,
+    furthestStepIndex: 0,
   }
 }
 
@@ -51,6 +53,32 @@ export function recordLocalStreakUpdate(): Streak {
   return updated
 }
 
+/** Seed every lesson as complete in local storage, so the "demo" account opens a
+ * fully finished course. Each lesson lands on step 1 with all steps unlocked. */
+export function seedDemoProgress() {
+  const now = new Date().toISOString()
+  for (const [id, lesson] of Object.entries(lessons)) {
+    saveLocalProgress(id, {
+      currentStepIndex: 0,
+      stepAnswers: {},
+      mastered: true,
+      completedAt: now,
+      furthestStepIndex: Math.max(0, lesson.steps.length - 1),
+    })
+  }
+}
+
+/** Wipe the seeded demo progress (used when leaving the demo). */
+export function clearDemoProgress() {
+  for (const id of Object.keys(lessons)) {
+    try {
+      localStorage.removeItem(`${LOCAL_KEY}-${id}`)
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 export function useLessonProgress(lessonId: string) {
   const { user } = useAuth()
   const [progress, setProgress] = useState<LessonProgress>(() =>
@@ -75,6 +103,7 @@ export function useLessonProgress(lessonId: string) {
           stepAnswers: data.stepAnswers ?? {},
           mastered: data.mastered ?? null,
           completedAt: data.completedAt ?? null,
+          furthestStepIndex: data.furthestStepIndex ?? 0,
         })
       } else {
         setProgress(defaultProgress())

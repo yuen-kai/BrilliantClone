@@ -2,129 +2,122 @@ import type { Lesson } from '../types/lesson'
 
 export const lesson5: Lesson = {
   id: 'lesson-5',
-  title: 'Casework',
+  title: 'Complementary Counting',
   subject: 'AP Statistics · Combinatorics',
   order: 5,
   prerequisiteLessonId: 'lesson-4',
-  tagline: 'Big messy count? Split it into clean cases, count each, and add them up.',
+  tagline: 'Sometimes the fastest way to count what you want is to count what you don’t.',
   completionMessage:
-    'You can break a problem into non-overlapping cases, multiply inside each, and add across them.',
+    'You’ve got the “at least one” trick: count the total, subtract the cases you don’t want.',
   steps: [
     {
-      id: 'step-1-burgers',
+      id: 'step-2-at-least-one',
       step: 1,
-      type: 'visual-interactive',
-      prompt:
-        'A lunch counter offers two kinds of lunch. CASE 1 is a build-your-own burger: 3 patties and 2 cheeses. Build the tree and count the burgers.',
-      visual: {
-        component: 'tree-build',
-        treeConfig: {
-          levels: [
-            { label: 'Patty', branchCount: 3 },
-            { label: 'Cheese', branchCount: 2 },
-          ],
-        },
-      },
-      gated: true,
-      stages: [
-        { kind: 'node-count', branchCount: 3, expectedNodeCount: 3, multiplierLabel: '×3' },
-        { kind: 'node-count', branchCount: 2, expectedNodeCount: 6, multiplierLabel: '×2' },
-      ],
-      finalGate: {
-        correctValue: 6,
-        prompt: 'How many different burgers are possible?',
-        hintText: 'Within one case you still multiply: 3 × 2.',
-        feedbackWrong: {
-          default: 'Multiply the choices inside this case: 3 × 2 = 6.',
-          specificCases: [
-            { answer: 5, message: 'That’s 3 + 2. Inside a single case the choices still multiply: 3 × 2 = 6.' },
-          ],
-        },
-      },
-      hintText: 'Count the nodes at this level.',
-      feedbackWrong: {
-        default: 'Count the nodes at this level.',
-        specificCases: [],
-      },
-    },
-    {
-      id: 'step-2-soups',
-      step: 2,
-      type: 'visual-interactive',
-      prompt:
-        'CASE 2 is the soup of the day: just pick one of 4 soups. Build this one-level tree and count the soups.',
-      visual: {
-        component: 'tree-build',
-        treeConfig: {
-          levels: [{ label: 'Soup', branchCount: 4 }],
-        },
-      },
-      gated: true,
-      stages: [{ kind: 'node-count', branchCount: 4, expectedNodeCount: 4, multiplierLabel: '×4' }],
-      finalGate: {
-        correctValue: 4,
-        prompt: 'How many soup lunches are possible?',
-        hintText: 'There are 4 soups and nothing else to choose.',
-        feedbackWrong: {
-          default: 'It’s just the 4 soups.',
-          specificCases: [],
-        },
-      },
-      hintText: 'Count the nodes at this level.',
-      feedbackWrong: {
-        default: 'Count the nodes at this level.',
-        specificCases: [],
-      },
-    },
-    {
-      id: 'step-3-combine',
-      step: 3,
       type: 'guided-solve',
-      prompt:
-        'Your lunch is a burger OR a soup, never both. The two cases do not overlap, so combine them.',
-      intro: 'Multiply WITHIN a case (you already did). To merge separate cases, ADD.',
-      resultLabel: 'lunches',
+      prompt: 'Now flip a coin 8 times. How many sequences have at least one heads?',
+      intro: 'All 256 sequences split by their number of heads. Listing them is hopeless.',
+      visual: {
+        component: 'complement-tree',
+        rootLabel: 'All sequences',
+        branches: [
+          { id: 'h0', label: '0 heads', count: 1, wanted: false },
+          { id: 'h1', label: '1 head', count: 8, wanted: true },
+          { id: 'h2', label: '2 heads', count: 28, wanted: true },
+          { id: 'h3', label: '3 heads', count: 56, wanted: true },
+          { id: 'h4', label: '4 heads', count: 70, wanted: true },
+          { id: 'h5', label: '5 heads', count: 56, wanted: true },
+          { id: 'h6', label: '6 heads', count: 28, wanted: true },
+          { id: 'h7', label: '7 heads', count: 8, wanted: true },
+          { id: 'h8', label: '8 heads', count: 1, wanted: true },
+        ],
+      },
+      resultLabel: 'sequences',
       blanks: [
         {
-          id: 'case1',
-          label: 'Case 1: burgers',
-          prompt: 'How many burgers did you count in Case 1?',
-          correctValue: 6,
-          revealExpression: '3 × 2 = 6',
-          hintText: 'You found 3 × 2 = 6 burgers.',
+          id: 'none',
+          label: 'Sequences with NO heads',
+          prompt: 'How many of the 256 sequences have zero heads (every flip is tails)?',
+          correctValue: 1,
+          revealExpression: 'just all-tails',
+          hintText: 'Zero heads means every flip came up tails. How many sequences are completely tails?',
           feedbackWrong: {
-            default: 'You counted 3 × 2 = 6 burgers in Case 1.',
-            specificCases: [],
+            default: 'There’s exactly one all-tails sequence.',
+            specificCases: [
+              { answer: 8, message: 'Not 8. “No heads” means every flip is tails — only one sequence does that. So 1.' },
+            ],
           },
         },
         {
-          id: 'case2',
-          label: 'Case 2: soups',
-          prompt: 'How many soup lunches in Case 2?',
-          correctValue: 4,
-          revealExpression: '4 soups',
-          hintText: 'There were 4 soups.',
+          id: 'wanted',
+          label: 'At least one heads',
+          prompt: 'So how many sequences have at least one heads?',
+          correctValue: 255,
+          revealExpression: '256 − 1 = 255',
+          hintText: 'Only the all-tails sequence has no heads. How do you count all 256 except that one?',
           feedbackWrong: {
-            default: 'Case 2 had 4 soups.',
-            specificCases: [],
+            default: 'Subtract the one all-tails case from 256: 256 − 1 = 255.',
+            specificCases: [
+              { answer: 1, message: 'That’s the all-tails case you’re removing. You want all the rest: 256 − 1 = 255.' },
+            ],
           },
         },
+      ],
+    },
+    {
+      id: 'step-3-dice',
+      step: 2,
+      type: 'guided-solve',
+      prompt: 'Roll two dice. How many outcomes show at least one 6?',
+      visual: {
+        component: 'complement-tree',
+        rootLabel: 'All outcomes',
+        branches: [
+          { id: 's0', label: 'no 6', count: 25, wanted: false },
+          { id: 's1', label: 'one 6', count: 10, wanted: true },
+          { id: 's2', label: 'two 6s', count: 1, wanted: true },
+        ],
+      },
+      resultLabel: 'outcomes',
+      blanks: [
         {
           id: 'total',
-          label: 'Total lunches',
-          prompt:
-            'A lunch is one case or the other, never both. So how many lunches in total? (6 and 4)',
-          correctValue: 10,
-          revealExpression: '6 + 4 = 10',
-          hintText: 'Cases don’t overlap, so add them: 6 + 4.',
+          label: 'Total outcomes',
+          prompt: 'Each die shows 1–6. How many outcomes for two dice?',
+          correctValue: 36,
+          revealExpression: '6 × 6 = 36',
+          hintText: 'Each die lands on one of 6 faces, and the dice are independent. How do independent choices combine?',
           feedbackWrong: {
-            default: 'Add the separate cases: 6 + 4 = 10.',
+            default: 'Two dice, 6 faces each: 6 × 6 = 36.',
             specificCases: [
-              {
-                answer: 24,
-                message:
-                  'Do not multiply cases; that’s for sequential choices. A lunch is a burger OR a soup, so ADD: 6 + 4 = 10.',
-              },
+              { answer: 12, message: 'That’s 6 + 6. The dice are independent choices, so multiply: 6 × 6 = 36.' },
+            ],
+          },
+        },
+        {
+          id: 'none',
+          label: 'Outcomes with NO 6',
+          prompt: 'How many outcomes have no 6 at all?',
+          correctValue: 25,
+          revealExpression: '5 × 5 = 25',
+          hintText: 'If neither die may show a 6, how many faces stay safe on each die, and how do the two combine?',
+          feedbackWrong: {
+            default: 'Ban the 6: each die has 5 options, so 5 × 5 = 25.',
+            specificCases: [
+              { answer: 10, message: 'That’s 5 + 5. Each die independently has 5 safe faces: 5 × 5 = 25.' },
+            ],
+          },
+        },
+        {
+          id: 'wanted',
+          label: 'At least one 6',
+          prompt: 'So how many outcomes show at least one 6?',
+          correctValue: 11,
+          revealExpression: '36 − 25 = 11',
+          hintText: 'You have the total and the number with no 6 at all. How do you get the ones with at least one 6?',
+          feedbackWrong: {
+            default: 'Subtract the complement: 36 − 25 = 11.',
+            specificCases: [
+              { answer: 25, message: 'That’s the no-6 count. Subtract it from the total: 36 − 25 = 11.' },
             ],
           },
         },
@@ -132,49 +125,47 @@ export const lesson5: Lesson = {
     },
     {
       id: 'step-4-rule',
-      step: 4,
+      step: 3,
       type: 'rule-statement',
       explanation:
-        'Casework: split the problem into cases that do not overlap and together cover everything. Count each case on its own (usually by multiplying within a case), then add the cases. Multiply within, add across. Total = case 1 + case 2 + …',
-      referenceStepId: 'step-1-burgers',
-      overlayExpression: 'One case: 3 × 2 = 6, then add the other cases',
+        'Complementary counting: when the thing you want is messy to count, especially “at least one” problems, count the total and subtract the cases you do not want. Wanted = Total − Unwanted.',
+      overlayExpression: 'Wanted = Total − Unwanted',
     },
     {
       id: 'step-5-cold',
-      step: 5,
+      step: 4,
       type: 'cold-problem',
       problems: [
         {
           id: 'problem-a',
           prompt:
-            'For an outfit you’ll wear EITHER a dress OR a top-and-bottom combo. You own 3 dresses. For the combo you have 4 tops and 2 bottoms. How many outfits are possible?',
-          correctValue: 11,
+            'You flip a coin 4 times. How many of the possible sequences contain at least one heads?',
+          correctValue: 15,
           feedbackWrong: {
             default:
-              'Case 1 (dress) = 3. Case 2 (top × bottom) = 4 × 2 = 8. They don’t overlap, so add: 3 + 8 = 11.',
+              'Total sequences = 2 × 2 × 2 × 2 = 16. Exactly one (all tails) has no heads, so 16 − 1 = 15.',
             specificCases: [
               {
-                answer: 24,
+                answer: 1,
                 message:
-                  'You multiplied the cases (3 × 4 × 2). But a dress and a top+bottom are separate cases, so count each (3 and 8) and add: 11.',
+                  'That’s the single all-tails sequence, the one you subtract. The answer is 16 − 1 = 15.',
               },
-              { answer: 9, message: 'Inside Case 2 you multiply: 4 × 2 = 8. Then add Case 1: 3 + 8 = 11.' },
+              { answer: 16, message: 'That’s every sequence, including all-tails. Remove that one: 16 − 1 = 15.' },
             ],
           },
         },
         {
           id: 'problem-b',
           prompt:
-            'Lunch is EITHER a soup or a sandwich. There are 3 soups. A sandwich is 4 breads × 3 fillings. How many lunches are possible?',
-          correctValue: 15,
+            'You roll two dice. How many outcomes have at least one die showing an even number?',
+          correctValue: 27,
           feedbackWrong: {
             default:
-              'Case 1 (soup) = 3. Case 2 (sandwich) = 4 × 3 = 12. Add the cases: 3 + 12 = 15.',
+              'Total = 36. Outcomes with no evens (both dice odd) = 3 × 3 = 9. So 36 − 9 = 27.',
             specificCases: [
               {
-                answer: 36,
-                message:
-                  'That’s 3 × 4 × 3, multiplying the cases. Soup and sandwich are separate cases: count each and add, 3 + 12 = 15.',
+                answer: 9,
+                message: 'That’s the all-odd complement. Subtract it from the total: 36 − 9 = 27.',
               },
             ],
           },

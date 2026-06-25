@@ -76,18 +76,63 @@
   text-align: left;
 }
 
-.lesson-runner__progress-bar {
-  height: 8px;
-  background: var(--border);
-  border-radius: 999px;
-  overflow: hidden;
+.lesson-runner__steps {
+  display: flex;
+  gap: 5px;
+  width: 100%;
 }
 
-.lesson-runner__progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-ink));
+/* One tappable segment per step. The visible bar is centered in a taller, easier
+ * hit area. Done steps are selectable; locked (not-yet-reached) ones are not. */
+.lesson-runner__step-seg {
+  flex: 1;
+  height: 22px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.lesson-runner__step-seg::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 8px;
   border-radius: 999px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--border);
+  transition: background 0.2s ease, height 0.15s ease, opacity 0.15s ease;
+}
+
+.lesson-runner__step-seg--done::before {
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+.lesson-runner__step-seg--current::before {
+  background: var(--accent);
+  height: 10px;
+}
+
+.lesson-runner__step-seg--locked {
+  cursor: not-allowed;
+}
+
+.lesson-runner__step-seg--done:hover::before {
+  height: 11px;
+  opacity: 0.85;
+}
+
+.lesson-runner__step-seg:focus-visible {
+  outline: none;
+}
+
+.lesson-runner__step-seg:focus-visible::before {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 /* ---- Completion ---- */
@@ -127,6 +172,45 @@
   font-size: 1.02rem;
   color: var(--text);
   max-width: 36ch;
+}
+
+.lesson-runner__unlock {
+  max-width: 42ch;
+  margin: 2px auto 6px;
+  padding: 14px 20px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.lesson-runner__unlock-tag {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lesson-runner__unlock-msg {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  color: var(--text-h);
+}
+
+.lesson-runner__unlock-code {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--surface);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: nowrap;
 }
 
 .lesson-runner__actions {
@@ -180,36 +264,13 @@
   padding: 0 16px;
 }
 
-.lesson-runner__nav {
-  display: flex;
-  gap: 8px;
-}
-
-.lesson-runner__nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 13px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  font-family: var(--sans);
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.lesson-runner__nav-btn:hover:not(:disabled) {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-bg);
-}
-
-.lesson-runner__nav-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+/* The global theme toggle is pinned at the viewport's top-left. On narrower
+ * screens the centered lesson column reaches that edge, so drop the in-lesson
+ * top bar below the toggle to keep the "← Course path" link clear of it. */
+@media (max-width: 960px) {
+  .lesson-runner__topbar {
+    margin-top: 36px;
+  }
 }
 
 .lesson-runner__back-inline {
@@ -222,48 +283,4 @@
 
 .lesson-runner__back-inline:hover {
   color: var(--accent);
-}
-
-/* Dev-only step jumper */
-.lesson-runner__dev {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 16px;
-  padding: 7px 10px;
-  font-size: 0.78rem;
-  color: var(--text);
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--spark-bg),
-    var(--spark-bg) 8px,
-    transparent 8px,
-    transparent 16px
-  );
-  border: 1px dashed var(--spark);
-  border-radius: var(--radius-sm);
-}
-
-.lesson-runner__dev-tag {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--spark);
-  background: var(--surface);
-  border: 1px solid var(--spark);
-  border-radius: 5px;
-  padding: 1px 5px;
-}
-
-.lesson-runner__dev-select {
-  margin-left: auto;
-  padding: 5px 8px;
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  color: var(--text-h);
-  background: var(--surface);
-  border: 1px solid var(--border-strong);
-  border-radius: 7px;
-  cursor: pointer;
 }

@@ -6,65 +6,65 @@ export const lesson3: Lesson = {
   subject: 'AP Statistics · Combinatorics',
   order: 3,
   prerequisiteLessonId: 'lesson-2',
-  tagline: 'Count freely, notice the repeats, then divide them away. A counter’s superpower.',
+  tagline:
+    'Lesson 2 divided out one kind of repeat — the orderings of your group. Now meet the others.',
   completionMessage:
-    'You can spot when a count double-counts, and divide by exactly the right factor.',
+    'You can spot when a count repeats itself and divide by exactly the right factor.',
   steps: [
     {
       id: 'step-1-handshakes',
       step: 1,
-      type: 'visual-interactive',
-      prompt:
-        '4 friends are at a party and every pair shakes hands once. To count, first build the tree of ordered greetings: pick who reaches out (4), then who they greet (3).',
+      type: 'discovery',
+      prompt: 'Four friends meet, and each pair shakes hands once. How many handshakes?',
       visual: {
-        component: 'tree-build',
-        treeConfig: {
-          levels: [
-            { label: 'Greeter', branchCount: 4 },
-            { label: 'Greeted', branchCount: 3 },
+        component: 'handshake-connect',
+        config: {
+          people: [
+            { id: 'ana', label: 'Ana', emoji: '👧' },
+            { id: 'bo', label: 'Bo', emoji: '👦' },
+            { id: 'cy', label: 'Cy', emoji: '🧒' },
+            { id: 'di', label: 'Di', emoji: '👩' },
           ],
         },
       },
-      gated: true,
-      stages: [
-        { kind: 'dual', branchCount: 4, expectedMultiplier: 4, expectedNodeCount: 4 },
-        { kind: 'dual', branchCount: 3, expectedMultiplier: 3, expectedNodeCount: 12 },
+      gates: [
+        {
+          id: 'ignoring',
+          label: 'If direction mattered',
+          prompt: 'If a greeting from Ana to Bo counted as different from Bo to Ana, how many greetings would there be?',
+          correctValue: 12,
+          revealExpression: '4 × 3 = 12',
+          hintText: 'Each of the 4 friends greets the other 3. How do those combine?',
+          feedbackWrong: {
+            default: 'Count every direction separately first. How many others can each friend greet?',
+            specificCases: [
+              { answer: 6, message: 'That looks merged already — Ana–Bo counted once. First keep both directions apart: how many greetings?' },
+            ],
+          },
+        },
+        {
+          id: 'considering',
+          label: 'Actual handshakes',
+          prompt: 'A handshake is the same both ways, so how many actual handshakes happen?',
+          correctValue: 6,
+          revealExpression: '12 ÷ 2 = 6',
+          hintText: 'Each handshake landed in your 12 twice. What should you do to 12 to undo that?',
+          feedbackWrong: {
+            default: 'When Ana shakes Bo’s hand, how many times did your count of 12 include that one handshake?',
+            specificCases: [
+              { answer: 12, message: 'That still counts both directions apart. Each handshake sits in that 12 twice — so what now?' },
+            ],
+          },
+        },
       ],
-      finalGate: {
-        correctValue: 6,
-        prompt:
-          'Your tree shows 12 ordered greetings. But a handshake between A and B is ONE handshake, counted twice here (A→B and B→A). How many actual handshakes happen?',
-        hintText: 'Each handshake was counted twice, so divide 12 by 2.',
-        feedbackWrong: {
-          default: 'Each real handshake appears twice in the tree. Divide: 12 ÷ 2 = 6.',
-          specificCases: [
-            {
-              answer: 12,
-              message:
-                'That’s the tree’s ordered count, where A→B and B→A are separate. A handshake is one pair, so divide by 2: you get 6.',
-            },
-            {
-              answer: 7,
-              message: 'Not a sum. Each of the 12 ordered greetings is one real handshake counted twice: 12 ÷ 2 = 6.',
-            },
-          ],
-        },
-      },
-      hintText: 'After this split, count how many nodes appear at this level.',
-      feedbackWrong: {
-        default: 'Count both the branches per node and the total nodes at this level.',
-        specificCases: [],
-      },
     },
     {
       id: 'step-2-round-table',
       step: 2,
-      type: 'guided-solve',
-      prompt:
-        '5 friends sit around a round table. What matters is who sits next to whom. Rotating everyone one seat over is the same arrangement.',
-      intro: 'Count as if seats were labeled, then divide out the rotations that repeat.',
+      type: 'discovery',
+      prompt: 'Five friends sit around a round table; only who’s next to whom matters. How many seatings?',
       visual: {
-        component: 'round-table',
+        component: 'round-rotations',
         seats: [
           { id: 'ana', label: 'Ana', emoji: '👧' },
           { id: 'bo', label: 'Bo', emoji: '👦' },
@@ -73,47 +73,32 @@ export const lesson3: Lesson = {
           { id: 'ed', label: 'Ed', emoji: '🧑' },
         ],
       },
-      resultLabel: 'distinct arrangements',
-      blanks: [
+      gates: [
         {
-          id: 'labeled',
-          label: 'Labeled seatings',
-          prompt:
-            'If the 5 seats were numbered 1–5, how many ways to seat the friends? (5 × 4 × 3 × 2 × 1)',
+          id: 'ignoring',
+          label: 'In a line',
+          prompt: 'What would the answer be if the 5 friends sat in a line instead of a circle?',
           correctValue: 120,
           revealExpression: '5! = 120',
-          hintText: 'That’s 5 × 4 × 3 × 2 × 1.',
+          hintText: 'A row fills one seat at a time: 5, then 4, 3, 2, 1. How do sequential choices combine?',
           feedbackWrong: {
-            default: 'With numbered seats it’s 5 × 4 × 3 × 2 × 1 = 120.',
+            default: 'In a row, every order is its own seating. How many orderings of 5?',
             specificCases: [
-              { answer: 25, message: 'Not 5 × 5. Each seat removes a person: 5 × 4 × 3 × 2 × 1 = 120.' },
+              { answer: 24, message: 'That looks like the rotations are already merged. In a row, how many orderings?' },
             ],
           },
         },
         {
-          id: 'rotations',
-          label: 'Rotations that repeat',
-          prompt:
-            'Now spin the table. How many rotations of the same circle look identical (including the original)? (One per seat.)',
-          correctValue: 5,
-          revealExpression: '5 rotations',
-          hintText: 'There are as many rotations as there are seats: 5.',
-          feedbackWrong: {
-            default: 'A circle of 5 can be rotated into 5 positions that all look the same.',
-            specificCases: [],
-          },
-        },
-        {
-          id: 'divide',
-          label: 'Distinct arrangements',
-          prompt: 'So how many genuinely different round-table arrangements? (120 ÷ 5)',
+          id: 'considering',
+          label: 'Around the table',
+          prompt: 'Now they’re at a round table, so rotations are the same seating. How many seatings are truly different?',
           correctValue: 24,
           revealExpression: '120 ÷ 5 = 24',
-          hintText: 'Divide the labeled count by the 5 rotations: 120 ÷ 5.',
+          hintText: 'Each circle appears once for every rotation — 5 of them. What should you do to 120 to remove the copies?',
           feedbackWrong: {
-            default: 'Divide out the rotations: 120 ÷ 5 = 24.',
+            default: 'Spin everyone one seat over — new seating or the same one? How many copies of each circle did the row make?',
             specificCases: [
-              { answer: 120, message: 'That still counts each circle 5 times (once per rotation). Divide by 5: 24.' },
+              { answer: 120, message: 'That’s the row count, where each circle appears once for every rotation. So what should you do to it?' },
             ],
           },
         },
@@ -122,58 +107,45 @@ export const lesson3: Lesson = {
     {
       id: 'step-3-letters',
       step: 3,
-      type: 'guided-solve',
-      prompt:
-        'How many different ways can you arrange the letters of the word TOO? The catch: the two O’s are identical, so swapping them changes nothing.',
-      intro: 'Pretend the letters are all distinct, then divide by the repeats you can’t see.',
+      type: 'discovery',
+      prompt: 'Rearrange TOO into every different word. How many are there?',
       visual: {
-        component: 'duplicate-row',
-        word: 'TOO',
-        tiles: [
-          { id: 't', label: 'T', groupId: 'T' },
-          { id: 'o1', label: 'O', groupId: 'O' },
-          { id: 'o2', label: 'O', groupId: 'O' },
-        ],
+        component: 'anagram-board',
+        config: {
+          word: 'TOO',
+          tiles: [
+            { id: 't', label: 'T', groupId: 'T' },
+            { id: 'o1', label: 'O', groupId: 'O' },
+            { id: 'o2', label: 'O', groupId: 'O' },
+          ],
+        },
       },
-      resultLabel: 'distinct words',
-      blanks: [
+      gates: [
         {
-          id: 'distinct',
-          label: 'If all letters were distinct',
-          prompt:
-            'Label them T, O₁, O₂ as if different. How many ways to arrange 3 distinct letters? (3 × 2 × 1)',
+          id: 'ignoring',
+          label: 'If letters differed',
+          prompt: 'If all three letters were different from each other, how many orderings would there be?',
           correctValue: 6,
           revealExpression: '3! = 6',
-          hintText: 'Three distinct letters arrange in 3 × 2 × 1 ways.',
+          hintText: 'Three distinct tiles in a row: 3 choices, then 2, then 1. How do they combine?',
           feedbackWrong: {
-            default: 'Three distinct letters: 3 × 2 × 1 = 6 arrangements.',
-            specificCases: [],
+            default: 'If both O’s were distinct, they’re just 3 different tiles. How many ways to order them?',
+            specificCases: [
+              { answer: 3, message: 'That looks like the O’s are already merged. Keeping them distinct, how many orderings?' },
+            ],
           },
         },
         {
-          id: 'dup',
-          label: 'Hidden duplicates',
-          prompt:
-            'Swapping O₁ and O₂ gives the same real word. How many of the 6 are secretly identical? (2 × 1 ways to order the O’s)',
-          correctValue: 2,
-          revealExpression: '2! = 2',
-          hintText: 'The two O’s can be ordered in 2 ways that look the same.',
-          feedbackWrong: {
-            default: 'The two identical O’s can swap in 2 ways, so every word is counted twice.',
-            specificCases: [],
-          },
-        },
-        {
-          id: 'divide',
-          label: 'Distinct words',
-          prompt: 'So how many actually-different words? (6 ÷ 2)',
+          id: 'considering',
+          label: 'Truly different',
+          prompt: 'But the two O’s are identical, so some orderings look the same. How many words actually look different?',
           correctValue: 3,
           revealExpression: '6 ÷ 2 = 3',
-          hintText: 'Divide by the repeats: 6 ÷ 2.',
+          hintText: 'Each word appears twice, once for each way to swap the O’s. What should you do to 6 to merge those?',
           feedbackWrong: {
-            default: 'Divide out the identical O orderings: 6 ÷ 2 = 3. (TOO, OTO, OOT.)',
+            default: 'Swap the two O’s in any word — does it change? How many of your 6 look truly different?',
             specificCases: [
-              { answer: 6, message: 'That counts O₁O₂ and O₂O₁ as different, but they look identical. Divide by 2: 3.' },
+              { answer: 6, message: 'That still counts O₁O₂ and O₂O₁ apart, but they read the same. So what should you do to it?' },
             ],
           },
         },
@@ -184,9 +156,8 @@ export const lesson3: Lesson = {
       step: 4,
       type: 'rule-statement',
       explanation:
-        'Overcounting: count the easy way, even if it counts each real outcome more than once. Then find how many times each was counted and divide by that. Answer = raw count ÷ copies of each.',
-      referenceStepId: 'step-1-handshakes',
-      overlayExpression: '4 × 3 = 12, then ÷ 2 = 6',
+        'Overcounting: count the easy way even if it counts each real outcome more than once. Find how many copies you made of each, then divide by that. Answer = raw count ÷ copies.',
+      overlayExpression: 'answer = raw count ÷ copies of each',
     },
     {
       id: 'step-5-cold',
@@ -195,35 +166,23 @@ export const lesson3: Lesson = {
       problems: [
         {
           id: 'problem-a',
-          prompt:
-            '6 people sit around a round table. How many genuinely different seating arrangements are there? (Rotations of the same circle count as one.)',
+          prompt: '6 people at a round table. How many distinct seatings? (Rotations count as one.)',
           correctValue: 120,
           feedbackWrong: {
-            default:
-              'Labeled seats give 6 × 5 × 4 × 3 × 2 × 1 = 720, but each circle is counted 6 times (one per rotation): 720 ÷ 6 = 120.',
+            default: 'Same idea as the table: count as if the seats were numbered, then handle the rotations that repeat each circle. What do you do with those copies?',
             specificCases: [
-              {
-                answer: 720,
-                message:
-                  'That’s the count with numbered seats. At a round table, divide by the 6 rotations: 720 ÷ 6 = 120.',
-              },
+              { answer: 720, message: 'That’s the numbered-seat count. Each circle repeats once per rotation — how many rotations, and what then?' },
             ],
           },
         },
         {
           id: 'problem-b',
-          prompt:
-            'A coach picks 2 players from a squad of 7 to be co-captains (the two roles are identical). How many ways?',
+          prompt: 'Pick 2 of 7 players as co-captains (identical roles). How many ways?',
           correctValue: 21,
           feedbackWrong: {
-            default:
-              'Ordered it’s 7 × 6 = 42, but the two co-captain spots are identical, so each pair is counted twice: 42 ÷ 2 = 21.',
+            default: 'Count it as if the two captain spots were ranked, then ask: do the roles actually differ? If not, how many times is each pair counted?',
             specificCases: [
-              {
-                answer: 42,
-                message:
-                  'That’s 7 × 6, which treats the two captains as ordered. They’re identical roles, so divide by 2: 21.',
-              },
+              { answer: 42, message: 'That ranks the two captains, but it’s the same role. How many times did each pair get counted?' },
             ],
           },
         },

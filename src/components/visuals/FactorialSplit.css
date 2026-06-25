@@ -1,0 +1,125 @@
+.fsplit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.fsplit__lead {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text);
+  text-align: center;
+}
+
+.fsplit__nfac {
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.fsplit__sequence {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.fsplit__group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.fsplit__chips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.fsplit__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 50px;
+  padding: 0 8px;
+  font-family: var(--display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: 2px solid var(--chip-border);
+  border-radius: 10px;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  animation: fsplit-in 0.42s ease backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.fsplit__times {
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 50px;
+  color: var(--times, var(--text));
+}
+
+/* The × that bridges the two groups — neutral, so it reads as the structural
+ * seam between "kept" and "divided out" rather than belonging to either. */
+.fsplit__times--join {
+  align-self: flex-start;
+  color: var(--border-strong);
+  margin: 0 1px;
+}
+
+/* A bracket under each group: groups its chips and points down at the tag. */
+.fsplit__brace {
+  height: 7px;
+  margin-top: 7px;
+  border: 2px solid var(--brace);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.fsplit__tag {
+  margin-top: 6px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-align: center;
+  color: var(--brace);
+}
+
+.fsplit__group--kept {
+  --chip-border: var(--accent);
+  --chip-bg: var(--accent-bg);
+  --chip-ink: var(--accent-ink);
+  --times: var(--accent);
+  --brace: var(--accent);
+}
+
+.fsplit__group--dropped {
+  --chip-border: var(--ember);
+  --chip-bg: var(--ember-bg);
+  --chip-ink: var(--ember);
+  --times: var(--ember);
+  --brace: var(--ember);
+}
+
+@keyframes fsplit-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fsplit__chip {
+    animation: none;
+  }
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { lessons, availableLessonIds } from './lessons'
 import { courseLessons } from './course'
+import { choose } from '../lib/lessonEngine'
 import type { Lesson } from '../types/lesson'
 
 const allLessons = Object.values(lessons)
@@ -106,21 +107,67 @@ describe.each(allLessons.map((l) => [l.id, l] as const))('lesson %s structure', 
     for (const step of lesson.steps) {
       if (step.type !== 'guided-solve' || !step.visual) continue
       const v = step.visual
-      if (v.component === 'round-table') {
-        expect(v.seats.length).toBeGreaterThanOrEqual(3)
-        expect(new Set(v.seats.map((s) => s.id)).size).toBe(v.seats.length)
-      } else if (v.component === 'stars-bars') {
-        expect(v.stars).toBeGreaterThan(0)
-        expect(v.bars).toBeGreaterThan(0)
-      } else if (v.component === 'complement-dots') {
-        expect(v.unwanted).toBeGreaterThanOrEqual(0)
-        expect(v.unwanted).toBeLessThanOrEqual(v.total)
-      } else if (v.component === 'duplicate-row') {
-        const sizes = v.tiles.reduce<Record<string, number>>((m, t) => {
-          m[t.groupId] = (m[t.groupId] ?? 0) + 1
-          return m
-        }, {})
-        expect(Object.values(sizes).some((c) => c > 1)).toBe(true)
+      if (v.component === 'complement-tree') {
+        expect(v.branches.length).toBeGreaterThanOrEqual(2)
+        // Exactly the complement strategy: at least one wanted and one unwanted branch.
+        expect(v.branches.some((b) => b.wanted)).toBe(true)
+        expect(v.branches.some((b) => !b.wanted)).toBe(true)
+      }
+    }
+  })
+
+  it('has well-formed equation-build steps', () => {
+    const permute = (n: number, k: number) => {
+      let p = 1
+      for (let i = 0; i < k; i++) p *= n - i
+      return p
+    }
+    for (const step of lesson.steps) {
+      if (step.type !== 'equation-build') continue
+      expect(['permutation', 'choose', 'stars-bars']).toContain(step.form)
+      expect(step.k).toBeGreaterThan(0)
+      // choose needs a non-empty complement (n > k); permutation allows n = k;
+      // stars-bars uses n = items (≥ 1) and k = groups (≥ 2, so ≥ 1 bar).
+      if (step.form === 'choose') {
+        expect(step.n).toBeGreaterThan(step.k)
+      } else if (step.form === 'permutation') {
+        expect(step.n).toBeGreaterThanOrEqual(step.k)
+      } else {
+        expect(step.n).toBeGreaterThan(0)
+        expect(step.k).toBeGreaterThanOrEqual(2)
+      }
+      // lhs frames perm/choose from a concrete product; stars-bars omits it.
+      const texts = [step.nLabel, step.kLabel, step.prompt, step.result, step.ruleName]
+      if (step.form !== 'stars-bars') texts.push(step.lhs ?? '')
+      for (const text of texts) {
+        expect(text.length).toBeGreaterThan(0)
+      }
+      // The number the result lands on must be the real count it claims to build.
+      // For stars-bars that's the formula C(n + k − 1, k − 1).
+      const expected =
+        step.form === 'choose'
+          ? choose(step.n, step.k)
+          : step.form === 'permutation'
+            ? permute(step.n, step.k)
+            : choose(step.n + step.k - 1, step.k - 1)
+      const lastNum = step.result.match(/(\d+)\s*$/)
+      expect(lastNum, `${step.id}: result must end in a number`).not.toBeNull()
+      expect(Number(lastNum?.[1]), `${step.id}: ${step.result}`).toBe(expected)
+    }
+  })
+
+  it('has well-formed stars-bars-solve steps', () => {
+    for (const step of lesson.steps) {
+      if (step.type !== 'stars-bars-solve') continue
+      expect(step.items).toBeGreaterThan(0)
+      expect(step.groups).toBeGreaterThanOrEqual(2)
+      expect(step.itemNoun.length).toBeGreaterThan(0)
+      expect(step.groupNoun.length).toBeGreaterThan(0)
+      // The derived count must be a real positive combination C(n + k − 1, k − 1).
+      const bars = step.groups - 1
+      expect(choose(step.items + bars, bars)).toBeGreaterThan(0)
+      if (step.scaffold !== undefined) {
+        expect(typeof step.scaffold).toBe('boolean')
       }
     }
   })
@@ -153,6 +200,52 @@ describe.each(allLessons.map((l) => [l.id, l] as const))('lesson %s structure', 
         expect(Number.isInteger(problem.correctValue)).toBe(true)
         expect(problem.correctValue).toBeGreaterThan(0)
       }
+    }
+  })
+
+  it('has well-formed classify steps', () => {
+    for (const step of lesson.steps) {
+      if (step.type !== 'classify') continue
+      expect(step.scenarios.length).toBeGreaterThanOrEqual(3)
+      const answers = new Set<string>()
+      for (const sc of step.scenarios) {
+        expect(['permutation', 'combination']).toContain(sc.answer)
+        expect(sc.text.length).toBeGreaterThan(0)
+        expect(sc.hint.length).toBeGreaterThan(0)
+        answers.add(sc.answer)
+      }
+      // Practice is only meaningful if both kinds show up.
+      expect(answers.has('permutation')).toBe(true)
+      expect(answers.has('combination')).toBe(true)
+      const ids = step.scenarios.map((sc) => sc.id)
+      expect(new Set(ids).size).toBe(ids.length)
+    }
+  })
+
+  it('has well-formed casework steps with consistent arithmetic', () => {
+    for (const step of lesson.steps) {
+      if (step.type !== 'casework') continue
+      expect(step.cases.length).toBeGreaterThanOrEqual(2)
+      const checkGate = (id: string, value: number, expr?: string) => {
+        expect(Number.isInteger(value)).toBe(true)
+        expect(value).toBeGreaterThan(0)
+        if (expr) {
+          const parsed = evalSimpleExpression(expr)
+          if (parsed) {
+            expect(parsed.value, `${id}: ${expr}`).toBe(parsed.target)
+            expect(parsed.target).toBe(value)
+          }
+        }
+      }
+      let sum = 0
+      for (const c of step.cases) {
+        expect(c.factors.reduce((a, b) => a * b, 1)).toBe(c.correctValue)
+        checkGate(c.id, c.correctValue, c.revealExpression)
+        sum += c.correctValue
+      }
+      checkGate('total', step.total.correctValue, step.total.revealExpression)
+      // The combined total must be the sum of the cases.
+      expect(step.total.correctValue).toBe(sum)
     }
   })
 })

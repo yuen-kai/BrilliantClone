@@ -23,17 +23,14 @@ export function GuidedSolveStepView({ step, onComplete }: GuidedSolveStepProps) 
 
   const currentBlank = step.blanks[blankIndex]
 
+  // On a wrong answer show only the hint (a leading nudge) — not the explanatory
+  // "wrong" text. Fall back to the message just for blanks that have no hint.
   const showWrong = useCallback(
     (blankHint: string | undefined, message: string) => {
       setErrorNonce((n) => n + 1)
-      setFeedback({ message, variant: 'wrong' })
-      if (blankHint) {
-        setTimeout(() => {
-          setFeedback((prev) =>
-            prev?.variant === 'wrong' ? { message: blankHint, variant: 'hint' } : prev,
-          )
-        }, 1500)
-      }
+      setFeedback(
+        blankHint ? { message: blankHint, variant: 'hint' } : { message, variant: 'wrong' },
+      )
     },
     [],
   )

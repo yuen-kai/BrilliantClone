@@ -1,0 +1,184 @@
+.cwtrees {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.cwtrees__canvas {
+  position: relative;
+  max-width: 100%;
+}
+
+.cwtrees__links {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.cwtrees__link {
+  stroke: var(--grow);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  animation: cw-draw 0.5s ease forwards;
+}
+
+.cwtrees__parent {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  padding: 7px 16px;
+  background: var(--grow-bg);
+  border: 1px solid var(--grow-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  animation: cw-pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cwtrees__parent-name {
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--grow);
+  white-space: nowrap;
+}
+
+.cwtrees__row {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.cwtree {
+  position: relative;
+  flex: 0 0 auto;
+  width: 236px;
+  height: 190px;
+  animation: cw-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cwtree--ghost {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--paper);
+  opacity: 0.5;
+  animation: none;
+}
+
+.cwtree__wires {
+  display: block;
+}
+
+/* Branches grow in once the case is answered (node shows first while asking). */
+.cwtree__branches {
+  animation: cw-grow 0.5s ease both;
+  transform-origin: center top;
+}
+
+.cwtree__edge {
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transition: stroke 0.4s ease;
+}
+
+.cwtree__hub {
+  fill: var(--surface);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+
+.cwtree__leaf {
+  fill: var(--accent);
+  transition: fill 0.4s ease;
+}
+
+.cwtree.is-combined .cwtree__leaf {
+  fill: var(--grow);
+}
+
+.cwtree.is-combined .cwtree__edge {
+  stroke: var(--grow-border);
+}
+
+.cwtree__root {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  max-width: 150px;
+  padding: 6px 12px 7px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.cwtree__emoji {
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.cwtree__name {
+  font-family: var(--display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-h);
+  white-space: nowrap;
+}
+
+@keyframes cw-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cw-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes cw-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes cw-grow {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cwtree,
+  .cwtrees__parent,
+  .cwtrees__link,
+  .cwtree__branches {
+    animation-duration: 0.01ms;
+  }
+}

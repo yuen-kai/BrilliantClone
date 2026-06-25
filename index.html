@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#5b2ee5" />
     <title>Combinatorics — learn by counting</title>
+    <script>
+      // Set theme before first paint so there's no flash of the wrong theme.
+      // Explicit choice (localStorage) wins; otherwise follow the OS preference.
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme')
+          document.documentElement.dataset.theme =
+            stored ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

@@ -33,7 +33,12 @@ type AuthContextValue = {
   logInWithGoogle: () => Promise<void>
   logOut: () => Promise<void>
   isConfigured: boolean
+  /** A local, no-account "demo" session with the whole course pre-completed. */
+  demoMode: boolean
+  enterDemo: () => void
 }
+
+const DEMO_KEY = 'brilliantclone-demo'
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -41,6 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [displayName, setDisplayName] = useState<string | null>(null)
   const [loading, setLoading] = useState(isFirebaseConfigured)
+  const [demoMode, setDemoMode] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(DEMO_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
 
   useEffect(() => {
     if (!auth || !db) {
@@ -120,23 +132,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     )
   }, [])
 
+  const enterDemo = useCallback(() => {
+    try {
+      localStorage.setItem(DEMO_KEY, '1')
+    } catch {
+      /* ignore */
+    }
+    setDemoMode(true)
+  }, [])
+
   const logOut = useCallback(async () => {
+    if (demoMode) {
+      try {
+        localStorage.removeItem(DEMO_KEY)
+      } catch {
+        /* ignore */
+      }
+      setDemoMode(false)
+      return
+    }
     if (!auth) throw new Error('Firebase not configured')
     await signOut(auth)
-  }, [])
+  }, [demoMode])
 
   const value = useMemo(
     () => ({
       user,
       loading,
-      displayName,
+      displayName: !user && demoMode ? 'Demo' : displayName,
       signUp,
       logIn,
       logInWithGoogle,
       logOut,
       isConfigured: isFirebaseConfigured,
+      demoMode,
+      enterDemo,
     }),
-    [user, loading, displayName, signUp, logIn, logInWithGoogle, logOut],
+    [user, loading, displayName, demoMode, signUp, logIn, logInWithGoogle, logOut, enterDemo],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -11,8 +11,7 @@ export const lesson1: Lesson = {
       id: 'step-1-sandwiches',
       step: 1,
       type: 'visual-interactive',
-      prompt:
-        'You have 2 breads, 3 meats, and 2 cheeses. Build the decision tree and find how many different sandwiches you can make.',
+      prompt: '2 breads, 3 meats, 2 cheeses. How many different sandwiches?',
       visual: {
         component: 'tree-build',
         treeConfig: {
@@ -32,21 +31,21 @@ export const lesson1: Lesson = {
       finalGate: {
         correctValue: 12,
         prompt: 'How many total sandwiches can you make?',
-        hintText: 'Count every complete path from top to bottom of your tree.',
+        hintText: 'Each full path from top to bottom is one sandwich. How many complete paths does your tree have?',
         feedbackWrong: {
-          default: 'Not quite. Count every full path through the tree, multiplying at each level.',
+          default: 'Not quite — adding the levels isn’t the same as counting whole sandwiches. What does one full path give you?',
           specificCases: [
             {
               answer: 7,
               message:
-                'You added 2 + 3 + 2 = 7, but that counts options at each level separately. Look at your tree and count every full path from top to bottom. Each path is one sandwich.',
+                'Looks like you added 2 + 3 + 2 — but that tallies each level on its own. Trace one full path top to bottom: how many complete paths are there?',
             },
           ],
         },
       },
-      hintText: 'After each split, count how many nodes appear at that level.',
+      hintText: 'After each split, how many nodes appear at the new level?',
       feedbackWrong: {
-        default: 'Count the nodes at this level after the split.',
+        default: 'How many nodes are at this level once it splits?',
         specificCases: [],
       },
     },
@@ -54,8 +53,7 @@ export const lesson1: Lesson = {
       id: 'step-2-pizzas',
       step: 2,
       type: 'visual-interactive',
-      prompt:
-        'A pizza shop offers 3 crusts, 2 sizes, and 3 toppings. Build the tree and find how many different pizzas are possible.',
+      prompt: 'A pizza shop offers 3 crusts, 2 sizes, and 3 toppings. How many different pizzas?',
       visual: {
         component: 'tree-build',
         treeConfig: {
@@ -75,21 +73,21 @@ export const lesson1: Lesson = {
       finalGate: {
         correctValue: 18,
         prompt: 'How many total pizzas are possible?',
-        hintText: 'Multiply the branch counts at each level.',
+        hintText: 'Each pizza is one full path top to bottom. How many complete paths are there?',
         feedbackWrong: {
-          default: 'Not quite. Multiply the options at each level together.',
+          default: 'Not quite — adding the levels counts parts, not whole pizzas. What does one full path give you?',
           specificCases: [
             {
               answer: 8,
               message:
-                'You may have added 3 + 2 + 3 = 8. Each level multiplies the previous, so count full paths through your tree.',
+                'Looks like you added 3 + 2 + 3 — but each level branches off the last. Does adding match the number of full paths? Trace one down.',
             },
           ],
         },
       },
-      hintText: 'Enter both the branches per node and the total nodes at this level.',
+      hintText: 'How many branches grow from each node, and how many nodes is that at this level?',
       feedbackWrong: {
-        default: 'Check both the multiplier and the total node count.',
+        default: 'Check both: branches per node, and total nodes at this level.',
         specificCases: [],
       },
     },
@@ -97,8 +95,7 @@ export const lesson1: Lesson = {
       id: 'step-3-padlock',
       step: 3,
       type: 'visual-interactive',
-      prompt:
-        'A padlock code has 2 letters (2 options each) followed by 1 digit (3 options). Build the tree, and notice the first two levels repeat the same branch count.',
+      prompt: 'A padlock code has 2 letters (2 options each), then 1 digit (3 options). How many codes?',
       visual: {
         component: 'tree-build',
         treeConfig: {
@@ -118,21 +115,21 @@ export const lesson1: Lesson = {
       finalGate: {
         correctValue: 12,
         prompt: 'How many different padlock codes are possible?',
-        hintText: 'Even when branch counts repeat, you still multiply, not add.',
+        hintText: 'Each code is one full path top to bottom — equal branch counts don’t change that. How many paths reach the bottom?',
         feedbackWrong: {
-          default: 'Not quite. Count full paths through the tree.',
+          default: 'Not quite — two levels sharing a branch count doesn’t mean you add. What does one full path give you?',
           specificCases: [
             {
               answer: 7,
               message:
-                'You added 2 + 2 + 3 = 7. Repeating the same branch count (2) does not mean you add. Each level still multiplies. Count every path top to bottom.',
+                'Looks like you added 2 + 2 + 3 — equal branch counts can tempt you to add. Does adding count whole codes? Follow a path to the bottom.',
             },
           ],
         },
       },
-      hintText: 'Enter both the branches per node and the total nodes at this level.',
+      hintText: 'How many branches grow from each node, and how many nodes is that at this level?',
       feedbackWrong: {
-        default: 'Check both the multiplier and the total node count.',
+        default: 'Check both: branches per node, and total nodes at this level.',
         specificCases: [],
       },
     },
@@ -157,12 +154,12 @@ export const lesson1: Lesson = {
           correctValue: 6760,
           feedbackWrong: {
             default:
-              'Use the multiplication principle: multiply the options at each step. 26 × 26 × 10.',
+              'These are sequential choices, just like the tree. How do the options at each step combine?',
             specificCases: [
               {
                 answer: 62,
                 message:
-                  'You may have added 26 + 26 + 10. The multiplication principle says multiply sequential choices: 26 × 26 × 10.',
+                  'Looks like you added 26 + 26 + 10. Each letter and digit is chosen in sequence — how should sequential choices combine?',
               },
             ],
           },
@@ -173,11 +170,11 @@ export const lesson1: Lesson = {
             'A product key is built by choosing 1 of 3 prefixes, then 1 of 8 colors, then 1 of 4 sizes. How many distinct keys are possible?',
           correctValue: 96,
           feedbackWrong: {
-            default: 'Multiply the options at each step: 3 × 8 × 4.',
+            default: 'Each key is a sequence: a prefix, then a color, then a size. How do those combine?',
             specificCases: [
               {
                 answer: 15,
-                message: 'You may have added 3 + 8 + 4. Multiply instead: 3 × 8 × 4.',
+                message: 'Looks like you added 3 + 8 + 4. These are sequential choices — what should you do instead?',
               },
             ],
           },

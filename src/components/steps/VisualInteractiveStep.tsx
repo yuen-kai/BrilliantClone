@@ -56,17 +56,13 @@ export function VisualInteractiveStepView({
     })
   }, [levels])
 
+  // Show only the hint on a wrong answer; the explanatory text is a no-hint fallback.
   const showWrong = useCallback(
     (message: string) => {
       setErrorNonce((n) => n + 1)
-      setFeedback({ message, variant: 'wrong' })
-      if (step.hintText) {
-        setTimeout(() => {
-          setFeedback((prev) =>
-            prev?.variant === 'wrong' ? { message: step.hintText, variant: 'hint' } : prev,
-          )
-        }, 1500)
-      }
+      setFeedback(
+        step.hintText ? { message: step.hintText, variant: 'hint' } : { message, variant: 'wrong' },
+      )
     },
     [step.hintText],
   )
@@ -146,10 +142,11 @@ export function VisualInteractiveStepView({
       setTimeout(onComplete, 800)
     } else {
       setErrorNonce((n) => n + 1)
-      setFeedback({
-        message: resolveFeedback(value, step.finalGate.feedbackWrong),
-        variant: 'wrong',
-      })
+      setFeedback(
+        step.finalGate.hintText
+          ? { message: step.finalGate.hintText, variant: 'hint' }
+          : { message: resolveFeedback(value, step.finalGate.feedbackWrong), variant: 'wrong' },
+      )
     }
   }
 

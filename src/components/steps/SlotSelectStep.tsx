@@ -144,16 +144,10 @@ export function SlotSelectStepView({ step, onComplete }: SlotSelectStepProps) {
     prevRects.current = newRects
   }, [picked, reordering])
 
+  // Show only the hint on a wrong answer; the explanatory text is a no-hint fallback.
   const showWrong = useCallback((hint: string | undefined, message: string) => {
     setErrorNonce((x) => x + 1)
-    setFeedback({ message, variant: 'wrong' })
-    if (hint) {
-      setTimeout(() => {
-        setFeedback((prev) =>
-          prev?.variant === 'wrong' ? { message: hint, variant: 'hint' } : prev,
-        )
-      }, 1600)
-    }
+    setFeedback(hint ? { message: hint, variant: 'hint' } : { message, variant: 'wrong' })
   }, [])
 
   const handleOptionSubmit = (value: number) => {

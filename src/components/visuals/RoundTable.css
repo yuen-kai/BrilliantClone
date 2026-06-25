@@ -15,20 +15,6 @@
   justify-content: center;
 }
 
-/* Fixed marker so the spin is obviously a rotation, not a reshuffle. */
-.round-table__head {
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 11px solid var(--accent);
-  z-index: 3;
-}
-
 .round-table__ring {
   position: relative;
   width: 100%;
@@ -57,6 +43,7 @@
   margin: -26px 0 0 -26px;
   width: 52px;
   height: 52px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.1, 0.5, 1);
 }
 
 .round-table__person {
@@ -65,7 +52,76 @@
   align-items: center;
   gap: 1px;
   width: 52px;
-  transition: transform 0.7s cubic-bezier(0.34, 1.1, 0.5, 1);
+  cursor: grab;
+  touch-action: none;
+  /* Don't let a drag select the emoji/name text. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  /* Counter-rotation rides the `rotate` property so the wiggle hint can own
+   * `transform` without clobbering it. */
+  transition: rotate 0.7s cubic-bezier(0.34, 1.1, 0.5, 1), transform 0.18s ease,
+    box-shadow 0.18s ease, background-color 0.18s ease, opacity 0.15s;
+}
+
+.round-table__person:active {
+  cursor: grabbing;
+}
+
+.round-table__person.is-lifted {
+  opacity: 0.25;
+}
+
+/* Mid-drag: softly ring the seats this person can swap into... */
+.round-table__person.is-drop-candidate {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 2px var(--accent-border);
+}
+
+/* ...and strengthen the one currently under the pointer. */
+.round-table__person.is-drop-target {
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-bg);
+  box-shadow: 0 0 0 2.5px var(--accent);
+  transform: scale(1.1);
+}
+
+/* Until the learner has grabbed anyone, hint that people are draggable. */
+.round-table__person.is-hint {
+  transform-origin: 50% 60%;
+  animation: round-table-wiggle 2.4s ease-in-out infinite;
+}
+
+.round-table__seat:nth-child(even) .round-table__person.is-hint {
+  animation-delay: 1.2s;
+}
+
+@keyframes round-table-wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  3% {
+    transform: rotate(-5deg);
+  }
+  6% {
+    transform: rotate(5deg);
+  }
+  9% {
+    transform: rotate(-3deg);
+  }
+  12% {
+    transform: rotate(3deg);
+  }
+  15%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .round-table__person.is-hint {
+    animation: none;
+  }
 }
 
 .round-table__emoji {
@@ -77,6 +133,19 @@
   font-size: 0.68rem;
   font-weight: 700;
   color: var(--text-h);
+}
+
+/* Lifted clone that follows the pointer while dragging. */
+.round-table__ghost {
+  position: fixed;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 52px;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.2);
 }
 
 .round-table__controls {

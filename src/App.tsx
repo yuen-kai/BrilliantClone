@@ -3,7 +3,8 @@ import { isLayerActive } from './config/buildLayer'
 import { AuthProvider } from './context/AuthContext'
 import { AuthGate } from './components/auth/AuthGate'
 import { CoursePath } from './components/course/CoursePath'
-import { DevLevelPicker } from './components/DevLevelPicker'
+import { ThemeToggle } from './components/ThemeToggle'
+import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { LessonPage } from './pages/LessonPage'
 import './App.css'
@@ -21,8 +22,9 @@ function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route
-        path="/"
+        path="/course"
         element={
           <AuthGate>
             <CoursePath />
@@ -39,8 +41,8 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
+      <ThemeToggle />
       <BrowserRouter>
-        <DevLevelPicker />
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>

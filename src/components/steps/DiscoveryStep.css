@@ -1,0 +1,114 @@
+.discovery-step {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.discovery-step__prompt {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.discovery-step__visual {
+  display: flex;
+  justify-content: center;
+  padding: 18px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  animation: discovery-gate-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.discovery-step__gates {
+  list-style: none;
+  margin: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  animation: discovery-gate-in 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.discovery-step__gate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.discovery-step__gate.is-current {
+  flex-direction: column;
+  align-items: stretch;
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.discovery-step__gate.is-confirmed {
+  border-color: var(--grow-border);
+}
+
+.discovery-step__gate-label {
+  font-family: var(--display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.discovery-step__gate-active {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.discovery-step__gate-prompt {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--text-h);
+}
+
+.discovery-step__gate-solved {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.discovery-step__gate-expr {
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.discovery-step__gate-value {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--grow);
+}
+
+@keyframes discovery-gate-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

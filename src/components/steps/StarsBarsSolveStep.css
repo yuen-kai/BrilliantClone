@@ -1,0 +1,371 @@
+.sbsolve {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.sbsolve__prompt {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.sbsolve__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 168px;
+  padding: 22px 16px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- One persistent row that morphs from a tight token strip into boxes --- */
+.sbsolve__row-tokens {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  padding: 12px 16px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  min-height: 60px;
+  transition:
+    padding 0.34s ease,
+    background-color 0.34s ease,
+    border-color 0.34s ease;
+}
+
+.sbsolve__row-tokens.is-boxed {
+  padding: 8px 4px;
+  background: transparent;
+  border-color: transparent;
+}
+
+/* A cell is a FIXED slot in the row — it never reorders or moves. Its only motion
+   is the one-time split morph (staggered per cell). A drag moves the bar *inside*
+   it (the .sbsolve__bartoken), never the cell. */
+.sbsolve__cell {
+  position: relative;
+  flex: 0 0 auto;
+  width: 30px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  background-color: transparent;
+  box-sizing: border-box;
+  transition-property: width, background-color, border-color, box-shadow;
+  transition-duration: 0.4s, 0.34s, 0.34s, 0.34s;
+  transition-timing-function: cubic-bezier(0.34, 1.2, 0.5, 1), ease, ease, ease;
+  transition-delay: calc(var(--i, 0) * 55ms);
+}
+
+.sbsolve__cell--bar {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  cursor: grab;
+  touch-action: none;
+  /* Bars stack above the muted star cells so a gliding bar reads on top. */
+  z-index: 2;
+}
+
+.sbsolve__cell--bar.is-dragging {
+  cursor: grabbing;
+}
+
+/* The grabbed bar floats above every cell while it follows the pointer. */
+.sbsolve__cell.is-dragging {
+  z-index: 30;
+}
+
+/* Clear drop affordance (boxed/swap view): the star box the bar will land in
+   lights up hard — accent border, tinted fill, ring + glow — so it reads the
+   instant the pointer crosses it. */
+.sbsolve__cell.is-drop-target {
+  border-color: var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 18%, var(--paper));
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent),
+    0 6px 16px -6px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* While a bar is in hand, drop highlights must be snappy: drop the per-cell morph
+   stagger delay and the slow 0.34s color fade so the target flips on/off the
+   moment the pointer moves between boxes. */
+.sbsolve__row-tokens.is-dragging .sbsolve__cell {
+  transition-duration: 0.08s;
+  transition-delay: 0s;
+}
+
+/* The single moving element on a drag/drop — transform is driven by JS (live
+   pointer follow, then a FLIP glide into the fixed box). */
+.sbsolve__bartoken {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: transform;
+}
+
+.sbsolve__star {
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--text);
+  opacity: 0.5;
+}
+
+.sbsolve__bar {
+  width: 5px;
+  height: 32px;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 2px 4px -1px color-mix(in srgb, var(--accent) 35%, transparent);
+  transition: width 0.15s ease, height 0.34s ease;
+}
+
+.sbsolve__cell--bar:hover .sbsolve__bar {
+  width: 7px;
+}
+
+.sbsolve__cell--bar.is-dragging .sbsolve__bar {
+  width: 8px;
+}
+
+/* --- The split state: each cell becomes a bordered position box.
+   Kept narrow + nowrap so up to ~9 boxes stay on one row for the drag math. --- */
+.sbsolve__pos {
+  width: 40px;
+  height: 50px;
+  border-color: var(--border-strong);
+  background-color: var(--paper);
+  box-shadow: var(--shadow-sm);
+}
+
+/* The chosen boxes (the bars) pop against the muted star boxes. */
+.sbsolve__pos--bar {
+  border-color: var(--accent);
+  background-color: var(--accent-bg);
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.sbsolve__pos .sbsolve__star {
+  font-size: 1.3rem;
+}
+
+.sbsolve__pos .sbsolve__bar {
+  height: 28px;
+}
+
+/* --- Live sharing: stars per group, updates as bars are dragged --- */
+.sbsolve__dist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.sbsolve__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+}
+
+.sbsolve__group strong {
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.sbsolve__caption {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text);
+  text-align: center;
+  max-width: 440px;
+}
+
+/* --- Ledger of solved steps --- */
+.sbsolve__ledger {
+  list-style: none;
+  margin: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.sbsolve__row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.sbsolve__row.is-confirmed {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-color: var(--grow-border);
+}
+
+.sbsolve__row.is-current {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.sbsolve__row-label {
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.sbsolve__row.is-current .sbsolve__row-label {
+  color: var(--accent-ink);
+}
+
+.sbsolve__row-solved {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.sbsolve__expr {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.sbsolve__row-value {
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--grow);
+}
+
+.sbsolve__row-prompt {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+  color: var(--text-h);
+}
+
+/* Step 1 gives the slots, so the "Slots" row just offers the split instead of an input. */
+.sbsolve__row-given {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sbsolve__next {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 11px 22px;
+  font-size: 0.98rem;
+  font-weight: 600;
+  font-family: var(--display);
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.sbsolve__next:hover {
+  filter: brightness(1.08);
+}
+
+.sbsolve__next:active {
+  transform: translateY(1px);
+}
+
+.sbsolve__finish {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sbsolve__result {
+  margin: 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--grow);
+}
+
+.sbsolve__continue {
+  min-height: 50px;
+  padding: 13px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--display);
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s;
+}
+
+.sbsolve__continue:hover {
+  filter: brightness(1.08);
+}
+
+.sbsolve__continue:active {
+  transform: translateY(1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sbsolve__cell,
+  .sbsolve__row-tokens,
+  .sbsolve__row-tokens.is-dragging .sbsolve__cell,
+  .sbsolve__bartoken,
+  .sbsolve__bar {
+    transition: none;
+    animation: none;
+  }
+}

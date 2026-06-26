@@ -248,4 +248,22 @@ describe.each(allLessons.map((l) => [l.id, l] as const))('lesson %s structure', 
       expect(step.total.correctValue).toBe(sum)
     }
   })
+
+  it('has well-formed teach-back steps', () => {
+    for (const step of lesson.steps) {
+      if (step.type !== 'teach-back') continue
+      expect(step.concept.length).toBeGreaterThan(0)
+      expect(step.prompt.length).toBeGreaterThan(0)
+      expect(step.keyPoints.length).toBeGreaterThanOrEqual(3)
+      for (const kp of step.keyPoints) expect(kp.trim().length).toBeGreaterThan(0)
+      expect(new Set(step.keyPoints).size).toBe(step.keyPoints.length)
+    }
+  })
+
+  it('places any teach-back step immediately before the final check', () => {
+    lesson.steps.forEach((step, i) => {
+      if (step.type !== 'teach-back') return
+      expect(lesson.steps[i + 1]?.type, `${step.id} must precede a cold-problem`).toBe('cold-problem')
+    })
+  })
 })

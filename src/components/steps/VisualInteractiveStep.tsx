@@ -172,9 +172,8 @@ export function VisualInteractiveStepView({
 
       <p className="visual-step__legend">
         <span className="visual-step__legend-dot" aria-hidden="true" />
-        Each <strong>node</strong> (circle) is one combination-so-far. Every level branches
-        out of the one above it, so a level's total already counts all the choices above.
-        The bottom row is every complete combination.
+        Each <strong>node</strong> (circle) is one combination so far; the bottom row is every
+        complete one.
       </p>
 
       <div className="visual-step__controls">

@@ -55,8 +55,22 @@ export const lesson6: Lesson = {
       overlayExpression: 'C(n + k − 1, k − 1)',
     },
     {
-      id: 'step-4-cold',
+      id: 'step-teach-back',
       step: 5,
+      type: 'teach-back',
+      concept: 'stars and bars',
+      prompt:
+        "You're the teacher now. Explain how stars and bars works in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'The identical items are stars, and k groups are separated by k − 1 bars',
+        'Every arrangement of the stars and bars is exactly one way to share the items',
+        'So you count by choosing where the bars go among all the positions',
+        'The answer is C(n + k − 1, k − 1)',
+      ],
+    },
+    {
+      id: 'step-4-cold',
+      step: 6,
       type: 'cold-problem',
       problems: [
         {

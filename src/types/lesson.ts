@@ -307,6 +307,25 @@ export type ClassifyStep = {
   scenarios: ClassifyScenario[]
 }
 
+/**
+ * A "teach it back" step that sits right before the final check: the learner
+ * plays teacher and explains the concept to the AI, which corrects mistakes
+ * against the structured `keyPoints` (never quoting them). It's an AI-only step —
+ * when AI is off it's skipped, so the lesson still works as an MVP.
+ */
+export type TeachBackStep = {
+  id: string
+  step: number
+  type: 'teach-back'
+  /** Short name of what they're teaching, e.g. "the multiplication principle". */
+  concept: string
+  /** Opening line inviting the learner to teach. */
+  prompt: string
+  /** Structured ideas a sound explanation should cover; the AI checks against
+   * these and they double as the end-of-step recap. */
+  keyPoints: string[]
+}
+
 export type LessonStep =
   | VisualInteractiveStep
   | RuleStatementStep
@@ -318,6 +337,7 @@ export type LessonStep =
   | CaseworkStep
   | StarsBarsSolveStep
   | ClassifyStep
+  | TeachBackStep
 
 export type Lesson = {
   id: string

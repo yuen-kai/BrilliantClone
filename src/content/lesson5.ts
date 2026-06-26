@@ -132,8 +132,22 @@ export const lesson5: Lesson = {
       overlayExpression: 'Wanted = Total − Unwanted',
     },
     {
-      id: 'step-5-cold',
+      id: 'step-teach-back',
       step: 4,
+      type: 'teach-back',
+      concept: 'complementary counting',
+      prompt:
+        "You're the teacher now. Explain complementary counting in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'It’s easiest when counting what you want directly is messy, like “at least one”',
+        'Count the total number of outcomes',
+        'Count the unwanted outcomes (the complement)',
+        'Subtract to get the answer: wanted = total − unwanted',
+      ],
+    },
+    {
+      id: 'step-5-cold',
+      step: 5,
       type: 'cold-problem',
       problems: [
         {

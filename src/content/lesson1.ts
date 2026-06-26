@@ -6,6 +6,7 @@ export const lesson1: Lesson = {
   subject: 'AP Statistics · Combinatorics',
   order: 1,
   prerequisiteLessonId: null,
+  tagline: 'Stack a few choices in a row and watch the combinations pile up.',
   steps: [
     {
       id: 'step-1-sandwiches',
@@ -143,8 +144,22 @@ export const lesson1: Lesson = {
       overlayExpression: '2 × 2 × 3 = 12',
     },
     {
-      id: 'step-5-cold',
+      id: 'step-teach-back',
       step: 5,
+      type: 'teach-back',
+      concept: 'the multiplication principle',
+      prompt:
+        "You're the teacher now. Explain the multiplication principle in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'The choices happen in a sequence of separate steps',
+        'Each step has its own number of options, independent of the others',
+        'You multiply the option counts across the steps instead of adding them',
+        'The total number of outcomes is the product, like a × b × c',
+      ],
+    },
+    {
+      id: 'step-5-cold',
+      step: 6,
       type: 'cold-problem',
       problems: [
         {

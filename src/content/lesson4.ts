@@ -71,8 +71,22 @@ export const lesson4: Lesson = {
       overlayExpression: 'Total = case 1 + case 2 + …',
     },
     {
-      id: 'step-3-cold',
+      id: 'step-teach-back',
       step: 3,
+      type: 'teach-back',
+      concept: 'casework',
+      prompt:
+        "You're the teacher now. Explain how casework works in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'Split the problem into cases that don’t overlap and together cover everything',
+        'Count each case on its own',
+        'Multiply the choices within a single case',
+        'Add the case counts together for the total',
+      ],
+    },
+    {
+      id: 'step-3-cold',
+      step: 4,
       type: 'cold-problem',
       problems: [
         {

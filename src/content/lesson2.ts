@@ -298,8 +298,22 @@ export const lesson2: Lesson = {
       ],
     },
     {
-      id: 'step-7-cold',
+      id: 'step-teach-back',
       step: 10,
+      type: 'teach-back',
+      concept: 'permutations and combinations',
+      prompt:
+        "You're the teacher now. Explain the difference between permutations and combinations in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'A permutation is an arrangement where order matters; a combination is a selection where it does not',
+        'When you pick in order, the number of options counts down (n, then n − 1, …)',
+        'A combination divides the ordered count by the number of orderings of the chosen group (k!)',
+        'C(n, k) = n! / (k! (n − k)!)',
+      ],
+    },
+    {
+      id: 'step-7-cold',
+      step: 11,
       type: 'cold-problem',
       problems: [
         {

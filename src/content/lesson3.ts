@@ -160,8 +160,22 @@ export const lesson3: Lesson = {
       overlayExpression: 'answer = raw count ÷ copies of each',
     },
     {
-      id: 'step-5-cold',
+      id: 'step-teach-back',
       step: 5,
+      type: 'teach-back',
+      concept: 'overcounting',
+      prompt:
+        "You're the teacher now. Explain how to fix an overcount in your own words — I'll point out anything to fix before your final check.",
+      keyPoints: [
+        'First count the easy way, even if it counts each real outcome more than once',
+        'Figure out how many times each real outcome was repeated',
+        'Divide the raw count by that number of repeats',
+        'For example, unordered pairs come out to n(n − 1) / 2',
+      ],
+    },
+    {
+      id: 'step-5-cold',
+      step: 6,
       type: 'cold-problem',
       problems: [
         {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isLayerActive } from '../../config/buildLayer'
 import type { Lesson, LessonProgress, Op, VisualInteractiveStep } from '../../types/lesson'
@@ -15,6 +15,11 @@ import { CaseworkStepView } from '../steps/CaseworkStep'
 import { ClassifyStepView } from '../steps/ClassifyStep'
 import './LessonRunner.css'
 
+// AI-only; lazy so the AI SDK loads only when a learner reaches the teach step.
+const TeachBackStepView = lazy(() =>
+  import('../steps/TeachBackStep').then((m) => ({ default: m.TeachBackStepView })),
+)
+
 type LessonRunnerProps = {
   lesson: Lesson
   progress: LessonProgress
@@ -30,6 +35,7 @@ function stepKindLabel(type: Lesson['steps'][number]['type']): string {
   if (type === 'rule-statement') return 'Rule'
   if (type === 'equation-build') return 'Build'
   if (type === 'guided-solve' || type === 'slot-select' || type === 'stars-bars-solve') return 'Solve'
+  if (type === 'teach-back') return 'Teach'
   return 'Test'
 }
 
@@ -82,14 +88,18 @@ export function LessonRunner({
   // the completion screen.
   const newlyUnlocked = useMemo(() => newlyUnlockedAfterLevel(lesson.order), [lesson.order])
 
+  // The teach-back step is always part of the lesson; it shows an "unavailable"
+  // notice itself when no AI key is configured.
+  const steps = lesson.steps
+
   useEffect(() => {
     if (progress.currentStepIndex > 0 || progress.mastered !== null || progress.completedAt) {
       setStarted(true)
     }
   }, [progress.currentStepIndex, progress.mastered, progress.completedAt])
 
-  const currentStep = lesson.steps[progress.currentStepIndex]
-  const lastIndex = lesson.steps.length - 1
+  const currentStep = steps[progress.currentStepIndex]
+  const lastIndex = steps.length - 1
   // Highest step the learner may jump to: every step they've reached, or all of
   // them once the lesson is finished (so a restart can still navigate freely).
   const reached = progress.completedAt
@@ -98,26 +108,26 @@ export function LessonRunner({
 
   const handleStepComplete = useCallback(() => {
     const nextIndex = progress.currentStepIndex + 1
-    const lastIdx = lesson.steps.length - 1
+    const lastIdx = steps.length - 1
     onProgressChange({
       ...progress,
       currentStepIndex: nextIndex,
       furthestStepIndex: Math.max(progress.furthestStepIndex ?? 0, Math.min(nextIndex, lastIdx)),
-      ...(nextIndex >= lesson.steps.length ? { completedAt: new Date().toISOString() } : {}),
+      ...(nextIndex >= steps.length ? { completedAt: new Date().toISOString() } : {}),
     })
-  }, [lesson.steps.length, progress, onProgressChange])
+  }, [steps.length, progress, onProgressChange])
 
   const handleColdComplete = useCallback(
     (mastered: boolean) => {
       onProgressChange({
         ...progress,
-        currentStepIndex: lesson.steps.length,
-        furthestStepIndex: lesson.steps.length - 1,
+        currentStepIndex: steps.length,
+        furthestStepIndex: steps.length - 1,
         mastered,
         completedAt: new Date().toISOString(),
       })
     },
-    [lesson.steps.length, progress, onProgressChange],
+    [steps.length, progress, onProgressChange],
   )
 
   const handleStart = () => {
@@ -145,7 +155,7 @@ export function LessonRunner({
   if (
     progress.mastered !== null &&
     progress.completedAt &&
-    progress.currentStepIndex >= lesson.steps.length
+    progress.currentStepIndex >= steps.length
   ) {
     return (
       <div className="lesson-runner lesson-runner--complete">
@@ -210,7 +220,7 @@ export function LessonRunner({
     )
   }
 
-  const referenceStep = lesson.steps.find(
+  const referenceStep = steps.find(
     (s): s is VisualInteractiveStep =>
       s.type === 'visual-interactive' &&
       currentStep.type === 'rule-statement' &&
@@ -229,10 +239,10 @@ export function LessonRunner({
       </div>
       <div className="lesson-runner__header">
         <span className="lesson-runner__step-label">
-          Step {currentStep.step} of {lesson.steps.length}
+          Step {progress.currentStepIndex + 1} of {steps.length}
         </span>
         <div className="lesson-runner__steps" role="tablist" aria-label="Lesson steps">
-          {lesson.steps.map((s, i) => {
+          {steps.map((s, i) => {
             const segState =
               i === progress.currentStepIndex ? 'current' : i <= reached ? 'done' : 'locked'
             return (
@@ -243,8 +253,8 @@ export function LessonRunner({
                 onClick={() => handleJump(i)}
                 disabled={segState === 'locked'}
                 aria-current={segState === 'current' ? 'step' : undefined}
-                aria-label={`Step ${s.step}: ${stepKindLabel(s.type)}${segState === 'locked' ? ' (locked)' : ''}`}
-                title={`Step ${s.step} · ${stepKindLabel(s.type)}`}
+                aria-label={`Step ${i + 1}: ${stepKindLabel(s.type)}${segState === 'locked' ? ' (locked)' : ''}`}
+                title={`Step ${i + 1} · ${stepKindLabel(s.type)}`}
               />
             )
           })}
@@ -318,6 +328,12 @@ export function LessonRunner({
 
       {currentStep.type === 'classify' && (
         <ClassifyStepView key={currentStep.id} step={currentStep} onComplete={handleStepComplete} />
+      )}
+
+      {currentStep.type === 'teach-back' && (
+        <Suspense fallback={<p className="lesson-runner__mastery">Loading…</p>}>
+          <TeachBackStepView key={currentStep.id} step={currentStep} onComplete={handleStepComplete} />
+        </Suspense>
       )}
 
       {currentStep.type === 'cold-problem' && (

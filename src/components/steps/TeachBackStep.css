@@ -54,6 +54,18 @@
   transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.teach-step__problem {
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--text-h);
+  font-family: var(--display);
+}
+
 .teach-step__thread {
   display: flex;
   flex-direction: column;
@@ -169,34 +181,57 @@
   text-align: center;
 }
 
-.teach-step__unavailable {
-  padding: 18px 20px;
-  background: var(--surface);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius);
-}
-
-.teach-step__unavailable-title {
-  margin: 0 0 6px;
-  font-weight: 600;
-  color: var(--text-h);
-}
-
-.teach-step__unavailable-sub {
+.teach-step__lead {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.5;
   color: var(--text);
 }
 
-.teach-step__unavailable-sub code {
-  font-family: var(--mono);
-  font-size: 0.85em;
+.teach-step__rubric {
+  padding: 14px 16px;
   background: var(--accent-bg);
-  color: var(--accent-ink);
   border: 1px solid var(--accent-border);
-  border-radius: 5px;
-  padding: 1px 5px;
+  border-radius: var(--radius);
+}
+
+.teach-step__rubric-tag {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.teach-step__rubric ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teach-step__rubric-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-h);
+  font-size: 0.98rem;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.teach-step__rubric-item input {
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .teach-step__compose {
@@ -229,8 +264,31 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 10px;
+}
+
+.teach-step__help {
+  min-height: 46px;
+  padding: 11px 18px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-h);
+  font-weight: 600;
+  font-family: var(--display);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.teach-step__help:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.teach-step__help:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .teach-step__send {
@@ -265,6 +323,7 @@
 .teach-step__continue {
   min-height: 46px;
   padding: 11px 24px;
+  margin-left: auto;
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--accent);

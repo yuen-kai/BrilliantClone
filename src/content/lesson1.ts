@@ -148,13 +148,13 @@ export const lesson1: Lesson = {
       step: 5,
       type: 'teach-back',
       concept: 'the multiplication principle',
+      problem:
+        'A sandwich shop has 3 breads, 4 fillings, and 2 cheeses. How many different sandwiches can you make?',
       prompt:
-        "You're the teacher now. Explain the multiplication principle in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'The choices happen in a sequence of separate steps',
-        'Each step has its own number of options, independent of the others',
-        'You multiply the option counts across the steps instead of adding them',
-        'The total number of outcomes is the product, like a × b × c',
+        'You multiply the number of options at each step (instead of adding them)',
+        'The total is the product, like a × b × c',
       ],
     },
     {

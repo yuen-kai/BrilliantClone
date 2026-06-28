@@ -1,6 +1,6 @@
 import { choose } from './lessonEngine'
 
-export type Op = '+' | '-' | '*' | '/' | '!' | 'C' | 'P'
+export type Op = '+' | '-' | '*' | '/' | '^' | '!' | 'C' | 'P'
 
 export type EvalResult =
   | { ok: true; value: number; opsUsed: Set<Op> }
@@ -11,7 +11,7 @@ export type EvalResult =
       message: string
     }
 
-type SymbolTok = '+' | '-' | '*' | '/' | '!' | '(' | ')' | ','
+type SymbolTok = '+' | '-' | '*' | '/' | '^' | '!' | '(' | ')' | ','
 
 type Token =
   | { t: 'num'; value: number }
@@ -22,13 +22,14 @@ type Node =
   | { type: 'num'; value: number }
   | { type: 'neg'; operand: Node }
   | { type: 'fact'; operand: Node }
+  | { type: 'pow'; base: Node; exp: Node }
   | { type: 'bin'; op: '+' | '-' | '*' | '/'; left: Node; right: Node }
   | { type: 'func'; name: 'C' | 'P'; args: [Node, Node] }
 
 class ParseError extends Error {}
 class DomainError extends Error {}
 
-const SYMBOLS = new Set(['+', '-', '*', '/', '!', '(', ')', ','])
+const SYMBOLS = new Set(['+', '-', '*', '/', '^', '!', '(', ')', ','])
 
 function normalizeAliases(input: string): string {
   return input.replace(/×/g, '*').replace(/÷/g, '/').replace(/[−–]/g, '-')
@@ -73,8 +74,9 @@ function tokenize(input: string): Token[] | null {
 }
 
 /**
- * Recursive descent: expr → term → unary → postfix → primary.
- * Precedence low→high: (+ -) < (* /) < unary minus < postfix ! < primary.
+ * Recursive descent: expr → term → unary → power → postfix → primary.
+ * Precedence low→high: (+ -) < (* /) < unary minus < power ^ (right-assoc) <
+ * postfix ! < primary.
  * Operators are collected as they are consumed so callers can gate on them
  * without first evaluating (lets "locked" win over "domain").
  */
@@ -114,7 +116,19 @@ function parse(tokens: Token[]): { ast: Node; opsUsed: Set<Op> } {
       opsUsed.add('-')
       return { type: 'neg', operand: parseUnary() }
     }
-    return parsePostfix()
+    return parsePower()
+  }
+
+  // `^` binds tighter than × ÷ and unary minus, and is right-associative
+  // (2^3^2 = 2^(3^2)); the exponent goes back through parseUnary so 2^-1 works.
+  function parsePower(): Node {
+    const base = parsePostfix()
+    if (peek()?.t === '^') {
+      pos++
+      opsUsed.add('^')
+      return { type: 'pow', base, exp: parseUnary() }
+    }
+    return base
   }
 
   function parsePostfix(): Node {
@@ -182,6 +196,7 @@ function evalNode(node: Node): number {
   if (node.type === 'num') return node.value
   if (node.type === 'neg') return -evalNode(node.operand)
   if (node.type === 'fact') return factorial(evalNode(node.operand))
+  if (node.type === 'pow') return Math.pow(evalNode(node.base), evalNode(node.exp))
   if (node.type === 'func') {
     const a = evalNode(node.args[0])
     const b = evalNode(node.args[1])
@@ -232,7 +247,7 @@ export function evaluateExpression(input: string, allowedOps?: Set<Op>): EvalRes
   }
 }
 
-const PREC = { add: 1, mul: 2, neg: 3, postfix: 4, atom: 5 } as const
+const PREC = { add: 1, mul: 2, neg: 3, pow: 4, postfix: 5, atom: 6 } as const
 
 function precedence(node: Node): number {
   if (node.type === 'bin') {
@@ -241,6 +256,7 @@ function precedence(node: Node): number {
     return PREC.atom // division renders as a self-grouping \dfrac
   }
   if (node.type === 'neg') return PREC.neg
+  if (node.type === 'pow') return PREC.pow
   return PREC.atom
 }
 
@@ -253,6 +269,7 @@ function nodeToLatex(node: Node): string {
   if (node.type === 'num') return String(node.value)
   if (node.type === 'neg') return `-${wrap(node.operand, PREC.neg)}`
   if (node.type === 'fact') return `${wrap(node.operand, PREC.postfix)}!`
+  if (node.type === 'pow') return `${wrap(node.base, PREC.pow)}^{${nodeToLatex(node.exp)}}`
   if (node.type === 'func') {
     const a = nodeToLatex(node.args[0])
     const b = nodeToLatex(node.args[1])

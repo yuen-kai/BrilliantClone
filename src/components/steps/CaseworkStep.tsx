@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CaseworkStep } from '../../types/lesson'
 import { resolveFeedback } from '../../lib/feedback'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { CaseworkTrees } from '../visuals/CaseworkTrees'
 import { GateInput } from '../lesson/GateInput'
 import { FeedbackBanner } from '../lesson/FeedbackBanner'
@@ -24,6 +25,8 @@ export function CaseworkStepView({ step, onComplete }: CaseworkStepProps) {
   const n = step.cases.length
   const askingCase = answered < n
   const askingTotal = !askingCase && combined && !totalDone
+  // Enter triggers "Combine the cases" while that button is the active step.
+  useEnterKey(() => setCombined(true), !askingCase && !combined)
 
   const wrong = (message: string) => {
     setErrorNonce((x) => x + 1)

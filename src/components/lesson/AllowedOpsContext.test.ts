@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { allowedOpsForLevel, newlyUnlockedAfterLevel } from './AllowedOpsContext'
 
 describe('allowedOpsForLevel', () => {
-  it('level 1 (Multiplication) allows only basic arithmetic', () => {
-    expect([...allowedOpsForLevel(1)].sort()).toEqual(['*', '+', '-', '/'])
+  it('level 1 (Multiplication) allows only basic arithmetic (incl. powers)', () => {
+    expect([...allowedOpsForLevel(1)].sort()).toEqual(['*', '+', '-', '/', '^'])
   })
 
   it('level 2 (Permutations & Combinations) adds ! but keeps P and C locked', () => {

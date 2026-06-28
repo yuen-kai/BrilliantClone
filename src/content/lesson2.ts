@@ -302,13 +302,13 @@ export const lesson2: Lesson = {
       step: 10,
       type: 'teach-back',
       concept: 'permutations and combinations',
+      problem:
+        'You choose 2 of 5 friends to form a team (order does not matter). How would you count the possible teams?',
       prompt:
-        "You're the teacher now. Explain the difference between permutations and combinations in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'A permutation is an arrangement where order matters; a combination is a selection where it does not',
-        'When you pick in order, the number of options counts down (n, then n − 1, …)',
-        'A combination divides the ordered count by the number of orderings of the chosen group (k!)',
-        'C(n, k) = n! / (k! (n − k)!)',
+        'A permutation cares about the order of the picks; a combination does not',
+        'For a combination, divide the ordered count by the orderings of the chosen group',
       ],
     },
     {

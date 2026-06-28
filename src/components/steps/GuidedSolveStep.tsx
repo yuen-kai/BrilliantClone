@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import type { GuidedSolveStep } from '../../types/lesson'
 import { resolveFeedback } from '../../lib/feedback'
 import { validateSolveBlank } from '../../lib/lessonEngine'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { GateInput } from '../lesson/GateInput'
 import { FeedbackBanner } from '../lesson/FeedbackBanner'
 import { GuidedVisualView } from '../visuals/GuidedVisual'
@@ -20,6 +21,7 @@ export function GuidedSolveStepView({ step, onComplete }: GuidedSolveStepProps) 
   } | null>(null)
   const [errorNonce, setErrorNonce] = useState(0)
   const [done, setDone] = useState(false)
+  useEnterKey(onComplete, done)
 
   const currentBlank = step.blanks[blankIndex]
 

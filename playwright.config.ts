@@ -17,7 +17,8 @@ export default defineConfig({
   ],
   webServer: {
     // Build in offline mode so lesson/tree e2e tests run deterministically
-    // without requiring Firebase auth.
+    // without Firebase auth. This also keeps the AI tutor proxy unreachable, so
+    // tests never hit the live OpenAI API.
     command: 'VITE_DISABLE_FIREBASE=1 npm run build && npm run preview -- --port 4173',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,

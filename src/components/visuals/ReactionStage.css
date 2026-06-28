@@ -1,0 +1,233 @@
+.rxn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.rxn__svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 340 / 280;
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+  touch-action: none;
+}
+
+/* structural lines / bonds */
+.rxn__bond {
+  stroke: var(--ink, #1b1b1f);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.rxn__bond--lg {
+  stroke-dasharray: 1 0;
+}
+.rxn__bond--nu {
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 2.8;
+}
+.rxn__wedge {
+  fill: var(--ink, #1b1b1f);
+}
+.rxn__dash line {
+  stroke: var(--ink, #1b1b1f);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.rxn__axis {
+  stroke: var(--border-strong, #c9cee0);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 5;
+  opacity: 0.8;
+}
+.rxn__cone {
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+  opacity: 0.32;
+  transition: opacity 0.2s ease;
+}
+.rxn__cone.is-dim {
+  opacity: 0;
+}
+
+/* open approach lobe — turns inviting/forbidding as you aim */
+.rxn__lobe {
+  fill: color-mix(in srgb, var(--accent, #6c63ff) 16%, transparent);
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 3;
+  transition: fill 0.15s ease, stroke 0.15s ease;
+}
+.rxn__lobe.is-target {
+  fill: color-mix(in srgb, var(--grow, #34c77b) 28%, transparent);
+  stroke: var(--grow, #34c77b);
+}
+.rxn__lobe.is-bad {
+  fill: color-mix(in srgb, var(--flag, #e5484d) 22%, transparent);
+  stroke: var(--flag, #e5484d);
+}
+.rxn__lobe.is-closed {
+  fill: color-mix(in srgb, var(--ink, #16142b) 22%, transparent);
+  stroke: var(--border-strong, #c9cee0);
+  stroke-dasharray: 1 0;
+}
+.rxn__lobe.is-blocked {
+  fill: color-mix(in srgb, var(--flag, #e5484d) 34%, transparent);
+  stroke: var(--flag, #e5484d);
+  stroke-dasharray: 1 0;
+}
+
+/* steric bulk halo around a crowded substituent */
+.rxn__bulk {
+  fill: color-mix(in srgb, var(--flag, #e5484d) 12%, transparent);
+  stroke: color-mix(in srgb, var(--flag, #e5484d) 45%, transparent);
+  stroke-width: 1.2;
+}
+
+.rxn__atom-bg {
+  fill: var(--surface, #fff);
+}
+.rxn__c {
+  fill: var(--ink, #16142b);
+  font-family: var(--display, system-ui, sans-serif);
+  font-size: 18px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.rxn__glabel {
+  fill: var(--text-h, #1b1b1f);
+  font-family: var(--display, system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.rxn__glabel--lg {
+  fill: var(--flag, #d8553a);
+  font-weight: 700;
+}
+
+.rxn__rubber {
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+  opacity: 0.55;
+}
+
+/* the draggable nucleophile */
+.rxn__nu-dot {
+  fill: color-mix(in srgb, var(--accent, #6c63ff) 22%, transparent);
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 2;
+}
+.rxn__nu-label {
+  fill: var(--accent-ink, var(--accent, #4413c9));
+  font-family: var(--display, system-ui, sans-serif);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.rxn__nu-hit {
+  fill: transparent;
+  cursor: grab;
+}
+.rxn[data-phase='idle'] .rxn__nu-dot {
+  animation: rxn-pulse 2s ease-in-out infinite;
+}
+.rxn[data-phase='idle'] .rxn__nu-hit:active {
+  cursor: grabbing;
+}
+
+@keyframes rxn-pulse {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* energy panel (concerted) */
+.rxn__energy {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+.rxn__energy-svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 340 / 116;
+}
+.rxn__axis2 {
+  stroke: var(--border-strong, #c9cee0);
+  stroke-width: 1.4;
+}
+.rxn__curve {
+  fill: none;
+  stroke: var(--border-strong, #c9cee0);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.rxn__curve--trace {
+  stroke: var(--accent, #6c63ff);
+}
+.rxn__marker {
+  fill: var(--accent, #6c63ff);
+}
+.rxn__marker.is-fail {
+  fill: var(--flag, #e5484d);
+}
+
+.rxn__controls {
+  display: flex;
+  gap: 0.5rem;
+}
+.rxn__btn {
+  border: 1px solid var(--border-strong, #c9cee0);
+  background: var(--surface, #fff);
+  color: var(--text-h, #1b1b1f);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+.rxn__btn:hover:not(:disabled) {
+  border-color: var(--accent, #6c63ff);
+  color: var(--accent, #6c63ff);
+}
+.rxn__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.rxn__status {
+  min-height: 1.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.rxn__note {
+  color: var(--text, #6b6b73);
+}
+.rxn__flash {
+  color: var(--flag, #d8553a);
+  font-weight: 600;
+}
+.rxn__done {
+  color: var(--grow, #2e9b63);
+  font-weight: 700;
+}

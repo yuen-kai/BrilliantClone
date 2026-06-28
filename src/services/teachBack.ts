@@ -1,22 +1,24 @@
 /**
- * The AI side of the "teach it back" step, backed by Claude (Anthropic). The
- * learner explains the concept; Claude checks that explanation against the step's
- * structured key points and corrects mistakes. Claude only maps the explanation
- * to which key ideas were demonstrated and lists fixes — it never invents the
- * concept, so it stays grounded in the lesson's own checklist.
- *
- * If no API key is configured the call returns null and the UI shows the step as
- * unavailable — there are no canned/fallback responses.
+ * Client side of the "teach it back" tutor. The actual ChatGPT call runs in a
+ * Cloud Function (`teachAssess`) so the OpenAI key stays server-side and never
+ * ships in the browser bundle. Here we just call that function and shape the
+ * result; if Firebase isn't configured (or the call fails) we return null. We
+ * never fabricate AI replies. When the live tutor can't run, the UI swaps in an
+ * authored self-check instead (see TeachBackStep), so the step still happens.
  */
-import type Anthropic from '@anthropic-ai/sdk'
-import { ANTHROPIC_MODEL, getAnthropic, isAiConfigured } from './anthropic'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import { firebaseApp, isFirebaseConfigured } from '../firebase/config'
 
-export { isAiConfigured }
+/** The live tutor runs whenever the app is connected to Firebase (the proxy
+ * lives there). With Firebase off (offline/e2e) the step becomes an authored
+ * self-check against the rubric instead. */
+export const isAiConfigured = isFirebaseConfigured
 
 export type TeachTurn = { role: 'learner' | 'ai'; text: string }
 
-/** What the lesson hands the assessor: the concept name and its key ideas. */
-export type TeachTopic = { concept: string; keyPoints: string[] }
+/** What the lesson hands the assessor: the concept, the concrete problem the
+ * learner is teaching how to solve, and the key ideas a good approach shows. */
+export type TeachTopic = { concept: string; problem: string; keyPoints: string[] }
 
 export type TeachAssessment = {
   /** Key ideas the learner clearly demonstrated. */
@@ -54,82 +56,19 @@ export function normalizeAssessment(raw: unknown, keyPoints: string[]): TeachAss
   }
 }
 
-const SYSTEM = [
-  'You are a warm, encouraging tutor running a "teach it back" exercise: the learner is the teacher and explains a concept to you, right before their final check. Your job is to check their explanation against a list of KEY IDEAS and gently correct mistakes.',
-  'Always:',
-  '- React directly to what the learner JUST said. Name what they got right before nudging, and vary your wording — never repeat a canned line.',
-  '- If they seem unsure, confused, or give a thin answer, reassure them warmly and offer ONE concrete leading hint to get unstuck.',
-  '- Never quote the key ideas verbatim or hand over the full answer; guide with short hints and questions.',
-  '- Report your assessment ONLY by calling the submit_assessment tool.',
-].join('\n')
-
-const ASSESS_TOOL: Anthropic.Tool = {
-  name: 'submit_assessment',
-  description: 'Report which key ideas the learner has demonstrated and how to coach them next.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      correct: {
-        type: 'array',
-        items: { type: 'string' },
-        description: 'Key ideas the learner CLEARLY demonstrated, copied verbatim from the KEY IDEAS list.',
-      },
-      corrections: {
-        type: 'array',
-        items: { type: 'string' },
-        description: 'At most two short Socratic nudges toward what is still missing. Never the answer itself.',
-      },
-      message: {
-        type: 'string',
-        description: '1-3 supportive, specific sentences reacting to the learner.',
-      },
-      solid: {
-        type: 'boolean',
-        description: 'True only when every key idea has been demonstrated correctly.',
-      },
-    },
-    required: ['correct', 'corrections', 'message', 'solid'],
-  },
-}
-
-export function buildUserMessage(topic: TeachTopic, transcript: TeachTurn[]): string {
-  const ideas = topic.keyPoints.map((kp, i) => `${i + 1}. ${kp}`).join('\n')
-  const convo = transcript
-    .map((t) => `${t.role === 'ai' ? 'Tutor' : 'Learner'}: ${t.text}`)
-    .join('\n')
-  return [
-    `Concept the learner is teaching: ${topic.concept}`,
-    ``,
-    `KEY IDEAS to check against (copy any matches verbatim into "correct"):`,
-    ideas,
-    ``,
-    `Conversation so far:`,
-    convo,
-    ``,
-    `Assess the learner's most recent message by calling submit_assessment.`,
-  ].join('\n')
-}
-
-/** Ask Claude to assess one teaching turn. Returns null on any failure (no key,
- * network/API error, or no tool output) so the UI degrades honestly. */
+/** Assess one teaching turn via the Cloud Function proxy. Returns null on any
+ * failure (Firebase off, function missing, network/API error) so the UI
+ * degrades honestly. */
 export async function assessTeaching(
   topic: TeachTopic,
   transcript: TeachTurn[],
 ): Promise<TeachAssessment | null> {
-  const client = getAnthropic()
-  if (!client) return null
+  if (!isFirebaseConfigured || !firebaseApp) return null
   try {
-    const res = await client.messages.create({
-      model: ANTHROPIC_MODEL,
-      max_tokens: 700,
-      system: SYSTEM,
-      tools: [ASSESS_TOOL],
-      tool_choice: { type: 'tool', name: 'submit_assessment' },
-      messages: [{ role: 'user', content: buildUserMessage(topic, transcript) }],
-    })
-    const block = res.content.find((b) => b.type === 'tool_use')
-    if (!block || block.type !== 'tool_use') return null
-    return normalizeAssessment(block.input, topic.keyPoints)
+    const assess = httpsCallable(getFunctions(firebaseApp), 'teachAssess')
+    const res = await assess({ topic, transcript })
+    const raw = (res.data as { raw?: unknown } | null)?.raw
+    return raw == null ? null : normalizeAssessment(raw, topic.keyPoints)
   } catch {
     return null
   }

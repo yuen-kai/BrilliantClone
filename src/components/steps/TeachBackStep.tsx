@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { TeachBackStep } from '../../types/lesson'
-import { assessTeaching, isAiConfigured, scoreCoverage, type TeachTurn } from '../../services/teachBack'
+import { assessTeaching, scoreCoverage, type TeachTurn } from '../../services/teachBack'
+import { useAuth } from '../../context/AuthContext'
 import './TeachBackStep.css'
 
 type TeachBackStepProps = {
@@ -9,29 +10,95 @@ type TeachBackStepProps = {
 }
 
 export function TeachBackStepView(props: TeachBackStepProps) {
-  // No key → the tutor genuinely can't run, so say so (no fabricated replies).
-  return isAiConfigured ? <TeachChat {...props} /> : <TeachUnavailable {...props} />
+  const { aiEnabled } = useAuth()
+  // With AI on, the tutor checks the explanation live. With AI off (including a
+  // demo with the tutor toggled off) we keep the beat as an authored self-check:
+  // write the explanation, then grade it against the rubric. Either way it happens.
+  return aiEnabled ? <TeachChat {...props} /> : <TeachSelfCheck {...props} />
 }
 
-function TeachUnavailable({ step, onComplete }: TeachBackStepProps) {
+function TeachSelfCheck({ step, onComplete }: TeachBackStepProps) {
+  const [explanation, setExplanation] = useState('')
+  const [revealed, setRevealed] = useState(false)
+  const [covered, setCovered] = useState<boolean[]>(() => step.keyPoints.map(() => false))
+
+  const total = step.keyPoints.length
+  const clearCount = covered.filter(Boolean).length
+  const wrote = explanation.trim().length > 0
+
+  const toggle = (i: number) => setCovered((prev) => prev.map((v, j) => (j === i ? !v : v)))
+
   return (
     <div className="teach-step">
       <div className="teach-step__head">
         <div>
           <span className="teach-step__eyebrow">Your turn to teach</span>
-          <h2 className="teach-step__title">Explain {step.concept}</h2>
+          <h2 className="teach-step__title">Teach it back</h2>
         </div>
+        {revealed && (
+          <span className="teach-step__progress" aria-live="polite">
+            {clearCount} of {total} covered
+          </span>
+        )}
       </div>
-      <div className="teach-step__unavailable">
-        <p className="teach-step__unavailable-title">The teach-it-back tutor isn’t available.</p>
-        <p className="teach-step__unavailable-sub">
-          It needs an Anthropic API key (Claude). Set <code>VITE_ANTHROPIC_API_KEY</code> to turn on
-          the live tutor — for now you can head straight to the final check.
-        </p>
+
+      <p className="teach-step__problem">{step.problem}</p>
+      <p className="teach-step__lead">
+        Write out how you’d solve this in your own words, then check it against the rubric.
+      </p>
+
+      <textarea
+        className="teach-step__input"
+        placeholder="Write out your explanation in your own words…"
+        value={explanation}
+        onChange={(e) => setExplanation(e.target.value)}
+        rows={5}
+        autoFocus
+      />
+
+      {revealed && (
+        <>
+          <div className="teach-step__meter" aria-hidden="true">
+            <span
+              className="teach-step__meter-fill"
+              style={{ width: `${total ? (clearCount / total) * 100 : 0}%` }}
+            />
+          </div>
+          <div className="teach-step__rubric">
+            <span className="teach-step__rubric-tag">A solid explanation covers</span>
+            <ul>
+              {step.keyPoints.map((kp, i) => (
+                <li key={i}>
+                  <label className="teach-step__rubric-item">
+                    <input type="checkbox" checked={covered[i]} onChange={() => toggle(i)} />
+                    <span>{kp}</span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+
+      <div className="teach-step__row">
+        {!revealed && (
+          <button
+            type="button"
+            className="teach-step__send"
+            onClick={() => setRevealed(true)}
+            disabled={!wrote}
+          >
+            Check against the rubric →
+          </button>
+        )}
+        <button
+          type="button"
+          className={`teach-step__continue ${revealed ? 'is-ready' : ''}`}
+          onClick={onComplete}
+        >
+          Continue to the check →
+        </button>
       </div>
-      <button type="button" className="teach-step__send" onClick={onComplete} autoFocus>
-        Continue to the check →
-      </button>
     </div>
   )
 }
@@ -54,9 +121,7 @@ function TeachChat({ step, onComplete }: TeachBackStepProps) {
   const total = step.keyPoints.length
   const clearCount = Math.round(score * total)
 
-  const handleSend = async (e: FormEvent) => {
-    e.preventDefault()
-    const text = input.trim()
+  const sendTurn = async (text: string) => {
     if (!text || thinking) return
 
     const conversation: TeachTurn[] = [...turns, { role: 'learner', text }]
@@ -65,7 +130,7 @@ function TeachChat({ step, onComplete }: TeachBackStepProps) {
     setThinking(true)
 
     const assessment = await assessTeaching(
-      { concept: step.concept, keyPoints: step.keyPoints },
+      { concept: step.concept, problem: step.problem, keyPoints: step.keyPoints },
       conversation,
     )
     setThinking(false)
@@ -84,21 +149,30 @@ function TeachChat({ step, onComplete }: TeachBackStepProps) {
     setCorrections(assessment.corrections)
     setTurns((prev) => [
       ...prev,
-      { role: 'ai', text: assessment.message || 'Tell me a bit more about that.' },
+      { role: 'ai', text: assessment.message || 'Let me help — here’s the idea.' },
     ])
   }
+
+  const handleSend = (e: FormEvent) => {
+    e.preventDefault()
+    void sendTurn(input.trim())
+  }
+
+  // One-click escape when the learner is stuck: asks the tutor to just explain it.
+  const askForHelp = () => void sendTurn('I’m stuck — can you explain this part to me?')
 
   return (
     <div className="teach-step">
       <div className="teach-step__head">
         <div>
           <span className="teach-step__eyebrow">Your turn to teach</span>
-          <h2 className="teach-step__title">Explain {step.concept}</h2>
+          <h2 className="teach-step__title">Teach me how to solve this</h2>
         </div>
         <span className="teach-step__progress" aria-live="polite">
           {clearCount} of {total} ideas clear
         </span>
       </div>
+      <p className="teach-step__problem">{step.problem}</p>
       <div className="teach-step__meter" aria-hidden="true">
         <span className="teach-step__meter-fill" style={{ width: `${score * 100}%` }} />
       </div>
@@ -142,7 +216,7 @@ function TeachChat({ step, onComplete }: TeachBackStepProps) {
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault()
-              void handleSend(e)
+              void sendTurn(input.trim())
             }
           }}
           rows={3}
@@ -153,15 +227,24 @@ function TeachChat({ step, onComplete }: TeachBackStepProps) {
           <button type="submit" className="teach-step__send" disabled={thinking || !input.trim()}>
             {taught ? 'Send' : 'Teach the AI'}
           </button>
-          {taught && (
+          {!solid && (
             <button
               type="button"
-              className={`teach-step__continue ${solid ? 'is-ready' : ''}`}
-              onClick={onComplete}
+              className="teach-step__help"
+              onClick={askForHelp}
+              disabled={thinking}
             >
-              Continue to the check →
+              I’m stuck
             </button>
           )}
+          {/* Always available so the learner is never trapped — the real test is the final check. */}
+          <button
+            type="button"
+            className={`teach-step__continue ${solid ? 'is-ready' : ''}`}
+            onClick={onComplete}
+          >
+            Continue to the check →
+          </button>
         </div>
       </form>
     </div>

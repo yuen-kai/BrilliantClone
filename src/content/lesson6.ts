@@ -59,13 +59,13 @@ export const lesson6: Lesson = {
       step: 5,
       type: 'teach-back',
       concept: 'stars and bars',
+      problem:
+        'You share 6 identical cookies among 4 friends (a friend may get none). How many ways are there?',
       prompt:
-        "You're the teacher now. Explain how stars and bars works in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'The identical items are stars, and k groups are separated by k − 1 bars',
-        'Every arrangement of the stars and bars is exactly one way to share the items',
-        'So you count by choosing where the bars go among all the positions',
-        'The answer is C(n + k − 1, k − 1)',
+        'Use a star for each item and k − 1 bars to split into k groups',
+        'Count the ways to place the bars: C(n + k − 1, k − 1)',
       ],
     },
     {

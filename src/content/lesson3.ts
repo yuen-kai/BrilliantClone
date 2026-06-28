@@ -164,13 +164,13 @@ export const lesson3: Lesson = {
       step: 5,
       type: 'teach-back',
       concept: 'overcounting',
+      problem:
+        '8 friends each shake hands once with everyone else. How many handshakes happen in total?',
       prompt:
-        "You're the teacher now. Explain how to fix an overcount in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'First count the easy way, even if it counts each real outcome more than once',
-        'Figure out how many times each real outcome was repeated',
-        'Divide the raw count by that number of repeats',
-        'For example, unordered pairs come out to n(n − 1) / 2',
+        'Count the easy way first, even if it counts each outcome more than once',
+        'Divide by how many times each outcome was repeated',
       ],
     },
     {

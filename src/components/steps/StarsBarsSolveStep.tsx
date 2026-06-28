@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { StarsBarsSolveStep } from '../../types/lesson'
 import { choose } from '../../lib/lessonEngine'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { GateInput } from '../lesson/GateInput'
 import { FeedbackBanner } from '../lesson/FeedbackBanner'
 import './StarsBarsSolveStep.css'
@@ -142,6 +143,13 @@ export function StarsBarsSolveStepView({ step, onComplete }: StarsBarsSolveStepP
     variant: 'correct' | 'wrong' | 'hint'
   } | null>(null)
   const [errorNonce, setErrorNonce] = useState(0)
+
+  // Enter advances the "Next →" (when slots are given) and final "Continue".
+  const enterAdvance = useCallback(() => {
+    if (phase === 'done') onComplete()
+    else if (step.slotsGiven && phase === 'slots') setPhase('boxes')
+  }, [phase, step.slotsGiven, onComplete])
+  useEnterKey(enterAdvance, phase === 'done' || (!!step.slotsGiven && phase === 'slots'))
 
   const reduceMotion = useMemo(
     () =>

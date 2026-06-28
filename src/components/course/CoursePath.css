@@ -20,6 +20,67 @@
   align-items: center;
 }
 
+.course-path__demo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px dashed var(--border-strong, rgba(0, 0, 0, 0.25));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent, #6c63ff) 5%, transparent);
+}
+.course-path__demo-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text, #6b6b73);
+}
+.course-path__demo-seg {
+  display: flex;
+  gap: 4px;
+}
+.course-path__demo-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  background: var(--surface, #fff);
+  color: var(--text, #6b6b73);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
+}
+.course-path__demo-btn:hover {
+  border-color: var(--accent, #6c63ff);
+}
+.course-path__demo-btn.is-on {
+  background: var(--accent, #6c63ff);
+  border-color: var(--accent, #6c63ff);
+  color: #fff;
+}
+
+.course-path__all {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+}
+.course-path__all:hover {
+  color: var(--accent);
+}
+
 .course-card__mark {
   display: inline-grid;
   place-items: center;

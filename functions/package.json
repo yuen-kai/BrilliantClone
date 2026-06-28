@@ -1,0 +1,14 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for BrilliantClone (OpenAI teach-back proxy)",
+  "private": true,
+  "type": "commonjs",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "firebase-functions": "^6.4.0",
+    "openai": "^6.45.0"
+  }
+}

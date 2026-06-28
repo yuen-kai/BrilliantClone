@@ -1,0 +1,379 @@
+.ctest {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 3.5rem) 1.1rem 4rem;
+}
+
+.ctest__card {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+  border-radius: 20px;
+  padding: clamp(1.4rem, 4vw, 2.2rem);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ctest__eyebrow {
+  color: var(--accent, #6c63ff);
+  letter-spacing: 0.12em;
+}
+.ctest__title {
+  font-family: var(--display, system-ui, sans-serif);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  font-weight: 800;
+  margin: 0;
+  color: var(--ink, #1b1b1f);
+}
+.ctest__lead {
+  margin: 0;
+  color: var(--text, #6b6b73);
+  line-height: 1.5;
+}
+.ctest__rule {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink, #1b1b1f);
+}
+
+.ctest__intro {
+  text-align: center;
+  align-items: center;
+}
+
+.ctest__primary {
+  align-self: stretch;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--accent, #6c63ff);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.08s ease;
+}
+.ctest__primary:hover {
+  filter: brightness(1.05);
+}
+.ctest__primary:active {
+  transform: translateY(1px);
+}
+
+.ctest__back {
+  color: var(--text, #6b6b73);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.ctest__back:hover {
+  color: var(--accent, #6c63ff);
+}
+
+.ctest__progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.ctest__counter {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text, #6b6b73);
+}
+.ctest__bar {
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent, #6c63ff) 14%, var(--surface, #fff));
+  overflow: hidden;
+}
+.ctest__bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent, #6c63ff);
+  transition: width 0.3s ease;
+}
+
+.ctest__prompt {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ink, #1b1b1f);
+}
+
+.ctest__after {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.ctest__explain {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--paper, #faf9f6);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  color: var(--text, #4b4b53);
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.ctest__result {
+  text-align: center;
+  align-items: center;
+}
+.ctest__seal {
+  font-size: 2.4rem;
+  width: 4rem;
+  height: 4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 800;
+}
+.ctest__result.is-pass .ctest__seal {
+  color: var(--grow, #2e9b63);
+  background: color-mix(in srgb, var(--grow, #34c77b) 16%, var(--surface, #fff));
+}
+.ctest__result.is-fail .ctest__seal {
+  color: var(--flag, #d8553a);
+  background: color-mix(in srgb, var(--flag, #d8553a) 14%, var(--surface, #fff));
+}
+
+/* Every result seal pops in big; the title springs up under it. */
+.ctest__sealwrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin: 0 auto;
+}
+.ctest__result .ctest__seal {
+  position: relative;
+  z-index: 1;
+  animation: ctest-seal-in 0.5s cubic-bezier(0.18, 1.1, 0.4, 1.6) both;
+}
+.ctest__result .ctest__title {
+  animation: ctest-title-in 0.5s 0.12s cubic-bezier(0.2, 0.9, 0.3, 1.5) both;
+}
+
+/* Radiating rings behind the seal — a clearly visible pulse. */
+.ctest__ring {
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+  opacity: 0;
+  animation: ctest-ring 1.7s ease-out infinite;
+}
+.ctest__ring:nth-child(2) {
+  animation-delay: 0.55s;
+}
+.ctest__ring:nth-child(3) {
+  animation-delay: 1.1s;
+}
+.ctest__result.is-pass .ctest__ring {
+  color: var(--grow, #34c77b);
+}
+.ctest__result.is-primed .ctest__ring {
+  color: var(--accent, #6c63ff);
+}
+.ctest__result.is-reinforced .ctest__ring {
+  color: #f3a417;
+}
+
+/* Primed: a bold sparkle that pops in and keeps throbbing — still more to do. */
+.ctest__result.is-primed .ctest__seal {
+  color: var(--accent, #6c63ff);
+  background: color-mix(in srgb, var(--accent, #6c63ff) 18%, var(--surface, #fff));
+  animation:
+    ctest-seal-in 0.5s cubic-bezier(0.18, 1.1, 0.4, 1.6) both,
+    ctest-throb 1s 0.5s ease-in-out infinite;
+}
+
+/* Reinforced: the big payoff — a gold trophy that bursts in and glows. */
+.ctest__result.is-reinforced .ctest__seal {
+  color: #fff;
+  font-size: 2.1rem;
+  background: linear-gradient(140deg, #ffd76a, #f3a417);
+  animation:
+    ctest-burst-in 0.7s cubic-bezier(0.18, 1.2, 0.4, 1.7) both,
+    ctest-glow 1.6s 0.7s ease-in-out infinite;
+}
+.ctest__result.is-reinforced {
+  border-color: color-mix(in srgb, #f3a417 50%, transparent);
+}
+.ctest__result.is-reinforced .ctest__title {
+  background: linear-gradient(120deg, #e7920a, #f3c14b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Falling confetti burst on completion. */
+.ctest__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ctest__confetti-piece {
+  position: absolute;
+  top: -12%;
+  width: 9px;
+  height: 15px;
+  border-radius: 2px;
+  opacity: 0;
+  animation-name: ctest-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* Primed progress: Primed → Retest → Mastered, with the first step done. */
+.ctest__steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+}
+.ctest__step {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: var(--paper, #faf9f6);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.12));
+  color: var(--text, #6b6b73);
+  font-weight: 600;
+}
+.ctest__step.is-done {
+  background: color-mix(in srgb, var(--accent, #6c63ff) 16%, var(--surface, #fff));
+  border-color: color-mix(in srgb, var(--accent, #6c63ff) 45%, transparent);
+  color: var(--accent, #6c63ff);
+}
+.ctest__step-arrow {
+  color: var(--text, #9a9aa2);
+}
+
+@keyframes ctest-seal-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes ctest-burst-in {
+  0% {
+    transform: scale(0) rotate(-25deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.4) rotate(8deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.9) rotate(-4deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes ctest-title-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes ctest-throb {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.14);
+  }
+}
+@keyframes ctest-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(243, 164, 23, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 28px 8px rgba(243, 164, 23, 0.55);
+  }
+}
+@keyframes ctest-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+@keyframes ctest-fall {
+  0% {
+    top: -12%;
+    opacity: 0;
+    transform: rotate(var(--rot, 0deg));
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: 112%;
+    opacity: 0;
+    transform: rotate(calc(var(--rot, 0deg) + 540deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ctest__seal,
+  .ctest__title,
+  .ctest__ring,
+  .ctest__confetti-piece {
+    animation: none !important;
+  }
+  .ctest__confetti {
+    display: none;
+  }
+}
+.ctest__score {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--ink, #1b1b1f);
+}
+.ctest__score strong {
+  font-size: 1.5rem;
+  color: var(--accent, #6c63ff);
+}
+.ctest__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  align-self: stretch;
+  align-items: center;
+}
+
+.ctest--missing {
+  text-align: center;
+  padding-top: 3rem;
+}

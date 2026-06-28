@@ -1,0 +1,300 @@
+.nd {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.nd__svg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: grab;
+}
+.nd__svg.is-grabbing {
+  cursor: grabbing;
+}
+
+/* --- rotation affordance + anti target ----------------------------------- */
+.nd__ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 9;
+  pointer-events: none;
+}
+.nd__guide {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  stroke-dasharray: 5 6;
+  pointer-events: none;
+  transition: stroke 0.2s ease;
+}
+.nd__guide.is-anti {
+  stroke: var(--grow);
+}
+.nd__slot {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 5;
+  pointer-events: none;
+  transition: stroke 0.2s ease, fill 0.2s ease;
+}
+.nd__slot.is-anti {
+  stroke: var(--grow);
+  fill: var(--grow-bg);
+}
+
+/* --- carbons & bonds ----------------------------------------------------- */
+.nd__backc {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 2.5;
+  pointer-events: none;
+}
+.nd__hub {
+  fill: var(--ink);
+  pointer-events: none;
+}
+.nd__bond {
+  stroke: var(--border-strong);
+  stroke-width: 4;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.nd__bond.is-betah.is-target {
+  stroke: var(--sky);
+}
+.nd__bond.is-target.is-anti {
+  stroke: var(--grow);
+}
+.nd__bond.is-lg {
+  stroke: var(--ember);
+}
+
+.nd__atom-grp {
+  pointer-events: none;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+.nd__atom {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.nd__atom.is-betah {
+  stroke: var(--border-strong);
+}
+.nd__atom.is-betah.is-target {
+  stroke: var(--sky);
+  fill: var(--sky-bg);
+}
+.nd__atom.is-target.is-anti {
+  stroke: var(--grow);
+  fill: var(--grow-bg);
+}
+.nd__atom.is-lg {
+  stroke: var(--ember);
+  fill: var(--ember-bg);
+}
+.nd__label {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+/* --- base reagent (eliminate trigger) ------------------------------------ */
+.nd__base {
+  cursor: pointer;
+}
+.nd__base-pill {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  transition: filter 0.2s ease;
+}
+.nd__base.is-anti .nd__base-pill {
+  animation: nd-pulse 1.3s ease-in-out infinite;
+}
+.nd__base-label {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12px;
+  fill: var(--accent-ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+@keyframes nd-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 4px var(--grow));
+  }
+}
+
+/* --- concerted curved arrows --------------------------------------------- */
+.nd__arrow {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  animation: nd-draw 0.45s ease forwards;
+  pointer-events: none;
+}
+.nd__arrowhead {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@keyframes nd-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* --- elimination transition: Newman fades, alkene appears ---------------- */
+.nd__live {
+  transition: opacity 0.4s ease 0.4s;
+}
+.nd.is-eliminating .nd__live {
+  opacity: 0;
+}
+.nd.is-eliminating .nd__lg-grp,
+.nd.is-eliminating .nd__leaving-h {
+  opacity: 0;
+}
+
+.nd__product {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.9);
+  transition: opacity 0.45s ease 0.55s, transform 0.5s ease 0.55s;
+}
+.nd.is-eliminating .nd__product {
+  opacity: 1;
+  transform: scale(1);
+}
+.nd__pi {
+  stroke: var(--grow);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.nd__patom {
+  fill: var(--surface);
+  stroke: var(--grow);
+  stroke-width: 2;
+}
+.nd__pbond {
+  stroke: var(--border-strong);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+.nd__plabel {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 13px;
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* --- overlap meter ------------------------------------------------------- */
+.nd__meter {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.nd__meter-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+  white-space: nowrap;
+}
+.nd__meter-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--code-bg);
+  overflow: hidden;
+}
+.nd__meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.12s linear, background 0.2s ease;
+}
+.nd__meter.is-anti .nd__meter-fill {
+  background: var(--grow);
+}
+.nd__meter.is-anti .nd__meter-label {
+  color: var(--grow);
+}
+
+/* --- status -------------------------------------------------------------- */
+.nd__status {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.nd__note {
+  font-size: 0.82rem;
+  color: var(--text);
+  max-width: 320px;
+}
+.nd__flash {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spark);
+  background: var(--spark-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+.nd__done {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--grow);
+  background: var(--grow-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nd__live,
+  .nd__product,
+  .nd__atom-grp {
+    transition-duration: 0.01s;
+    transition-delay: 0s;
+  }
+  .nd__arrow {
+    animation-duration: 0.01s;
+  }
+  .nd__base.is-anti .nd__base-pill {
+    animation: none;
+  }
+}
+.nd.is-reduced .nd__live,
+.nd.is-reduced .nd__product {
+  transition-delay: 0s;
+}

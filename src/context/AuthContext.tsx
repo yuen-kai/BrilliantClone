@@ -22,6 +22,7 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { auth, db, isFirebaseConfigured } from '../firebase/config'
 import { googleSignInWithFallback } from '../lib/googleAuth'
+import { isAiConfigured } from '../services/teachBack'
 import type { Streak } from '../types/lesson'
 
 type AuthContextValue = {
@@ -33,12 +34,18 @@ type AuthContextValue = {
   logInWithGoogle: () => Promise<void>
   logOut: () => Promise<void>
   isConfigured: boolean
+  /** Whether the teach-back step uses the live AI tutor. Outside demo this just
+   * tracks AI availability; inside demo it's a toggle so you can preview both the
+   * tutor and the authored self-check. */
+  aiEnabled: boolean
+  setAiEnabled: (on: boolean) => void
   /** A local, no-account "demo" session with the whole course pre-completed. */
   demoMode: boolean
   enterDemo: () => void
 }
 
 const DEMO_KEY = 'brilliantclone-demo'
+const AI_KEY = 'brilliantclone-ai'
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
@@ -51,6 +58,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return localStorage.getItem(DEMO_KEY) === '1'
     } catch {
       return false
+    }
+  })
+  // null = follow AI availability; true/false = explicit demo preview override.
+  const [aiOverride, setAiOverride] = useState<boolean | null>(() => {
+    try {
+      const v = localStorage.getItem(AI_KEY)
+      return v === null ? null : v === '1'
+    } catch {
+      return null
     }
   })
 
@@ -141,6 +157,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setDemoMode(true)
   }, [])
 
+  const setAiEnabled = useCallback((on: boolean) => {
+    try {
+      localStorage.setItem(AI_KEY, on ? '1' : '0')
+    } catch {
+      /* ignore */
+    }
+    setAiOverride(on)
+  }, [])
+
   const logOut = useCallback(async () => {
     if (demoMode) {
       try {
@@ -165,10 +190,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logInWithGoogle,
       logOut,
       isConfigured: isFirebaseConfigured,
+      // The override only applies in demo, so a preview choice can't leak into a
+      // real signed-in session.
+      aiEnabled: demoMode ? (aiOverride ?? isAiConfigured) : isAiConfigured,
+      setAiEnabled,
       demoMode,
       enterDemo,
     }),
-    [user, loading, displayName, demoMode, signUp, logIn, logInWithGoogle, logOut, enterDemo],
+    [
+      user,
+      loading,
+      displayName,
+      demoMode,
+      aiOverride,
+      signUp,
+      logIn,
+      logInWithGoogle,
+      logOut,
+      setAiEnabled,
+      enterDemo,
+    ],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

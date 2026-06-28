@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import type { EquationBuildStep } from '../../types/lesson'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { FactorialSplit } from '../visuals/FactorialSplit'
 import { FeedbackBanner } from '../lesson/FeedbackBanner'
 import './EquationBuildStep.css'
@@ -67,6 +68,7 @@ export function EquationBuildStepView({ step, onComplete }: EquationBuildStepPro
   // Wrong numbers never stick, so every slot being filled means every slot is right.
   const solved = slots.every((s) => filled[s.id] !== null)
   const valueOf = (kind: Kind) => (kind === 'n' ? n : k)
+  useEnterKey(onComplete, solved)
 
   const flashWrong = (slotId: SlotId) => {
     setWrongSlot(slotId)

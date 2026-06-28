@@ -1,0 +1,77 @@
+.orgo-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.orgo-step__prompt {
+  font-size: 1.16rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.orgo-step__visual {
+  display: flex;
+  justify-content: center;
+}
+
+.orgo-step__wait {
+  text-align: center;
+  color: var(--text);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.orgo-step__gates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.orgo-step__gate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.orgo-step__gate.is-confirmed {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--grow-bg);
+  border-color: var(--grow-border);
+}
+
+.orgo-step__gate-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.orgo-step__gate-solved {
+  font-weight: 700;
+  color: var(--grow);
+}
+
+.orgo-step__gate-prompt {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.4;
+  color: var(--text-h);
+}

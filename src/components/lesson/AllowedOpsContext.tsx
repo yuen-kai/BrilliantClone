@@ -3,7 +3,7 @@ import type { Op } from '../../lib/mathExpr'
 
 /** Fundamental operators allowed everywhere, at every level. Advanced ops
  * (!, C, P) become available by level — see allowedOpsForLevel. */
-export const BASIC_OPS: ReadonlySet<Op> = new Set(['+', '-', '*', '/'])
+export const BASIC_OPS: ReadonlySet<Op> = new Set(['+', '-', '*', '/', '^'])
 
 /**
  * Operators available at a given course level (a lesson's `order`). Locking is

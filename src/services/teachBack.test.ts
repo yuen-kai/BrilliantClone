@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildUserMessage, normalizeAssessment, scoreCoverage } from './teachBack'
+import { normalizeAssessment, scoreCoverage } from './teachBack'
 
 const keyPoints = ['idea one', 'idea two', 'idea three', 'idea four']
 
@@ -44,20 +44,5 @@ describe('normalizeAssessment', () => {
   it('tolerates a malformed response', () => {
     const a = normalizeAssessment(null, keyPoints)
     expect(a).toEqual({ correct: [], corrections: [], message: '', solid: false })
-  })
-})
-
-describe('buildUserMessage', () => {
-  it('grounds the request in the concept, key ideas, and the conversation', () => {
-    const msg = buildUserMessage(
-      { concept: 'casework', keyPoints: ['split into cases', 'add the cases'] },
-      [
-        { role: 'ai', text: 'teach me' },
-        { role: 'learner', text: 'you split and add' },
-      ],
-    )
-    expect(msg).toContain('casework')
-    expect(msg).toContain('split into cases')
-    expect(msg).toContain('Learner: you split and add')
   })
 })

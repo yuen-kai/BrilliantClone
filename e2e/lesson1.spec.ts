@@ -1,13 +1,26 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Lesson 1 flow', () => {
-  test('landing page links into the course', async ({ page }) => {
+  test('landing page leads to login when signed out', async ({ page }) => {
     await page.goto('/')
 
     await expect(
       page.getByRole('heading', { level: 1, name: 'Learn to count anything.' }),
     ).toBeVisible()
-    await expect(page.getByRole('link', { name: 'Start the course' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Start counting' })).toHaveAttribute(
+      'href',
+      '/login',
+    )
+  })
+
+  test('landing page leads to courses once a session exists', async ({ page }) => {
+    // Firebase is disabled in e2e, so demo mode stands in for a logged-in session.
+    await page.goto('/login')
+    await page.getByRole('button', { name: /explore the demo/i }).click()
+    await expect(page).toHaveURL(/\/course$/)
+
+    await page.goto('/')
+    await expect(page.getByRole('link', { name: 'Start counting' })).toHaveAttribute(
       'href',
       '/course',
     )
@@ -15,13 +28,9 @@ test.describe('Lesson 1 flow', () => {
 
   test('loads course path and starts lesson on mobile viewport', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 })
-    await page.goto('/')
-
-    // "/" is the public landing now; the CTA leads into the course path.
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Learn to count anything.' }),
-    ).toBeVisible()
-    await page.getByRole('link', { name: 'Start the course' }).click()
+    // Go straight to the course path so lesson-1 is fresh (demo mode would seed
+    // progress); the landing → login → courses flow is covered above.
+    await page.goto('/course/counting')
 
     await expect(page.getByRole('heading', { name: 'Counting Strategies' })).toBeVisible()
     await expect(page.getByText('Multiplication Principle')).toBeVisible()

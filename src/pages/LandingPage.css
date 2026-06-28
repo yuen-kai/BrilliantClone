@@ -172,8 +172,8 @@
 
 .topic {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
+  flex-direction: column;
+  gap: 3px;
   padding: 18px 20px;
   background: var(--surface);
   border: 1.5px solid var(--border);
@@ -190,20 +190,6 @@
   box-shadow: var(--shadow-md);
 }
 
-.topic__num {
-  font-family: var(--mono);
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.topic__body {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
 .topic__title {
   font-family: var(--display);
   font-weight: 600;
@@ -218,47 +204,40 @@
   line-height: 1.45;
 }
 
-/* ---------- How it works ---------- */
-.landing__how-grid {
+/* ---------- How a lesson works: an ordered list, not feature cards ---------- */
+.landing__how-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 16px;
+  max-width: 60ch;
 }
 
-.howcard {
+.howstep {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 22px;
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  gap: 16px;
+  padding: 16px 0;
 }
 
-.howcard__step {
-  display: inline-grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
+.howstep + .howstep {
+  border-top: 1.5px solid var(--border);
+}
+
+.howstep__n {
+  flex-shrink: 0;
   font-family: var(--mono);
   font-size: 0.92rem;
   font-weight: 700;
+  line-height: 1.5;
   color: var(--accent);
-  background: var(--accent-bg);
-  border: 1.5px solid var(--accent-border);
-  border-radius: 50%;
 }
 
-.howcard__text {
-  font-size: 1rem;
-  line-height: 1.5;
+.howstep__text {
+  font-size: 1.04rem;
+  line-height: 1.55;
   color: var(--text);
 }
 
-.howcard__lead {
+.howstep__lead {
   font-family: var(--display);
   font-weight: 600;
   color: var(--text-h);
@@ -306,10 +285,6 @@
   .landing__topic-grid {
     grid-template-columns: 1fr 1fr;
     gap: 14px;
-  }
-
-  .landing__how-grid {
-    grid-template-columns: repeat(3, 1fr);
   }
 }
 

@@ -1,0 +1,321 @@
+.nme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.nme__svg {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  touch-action: none;
+}
+
+/* ---- bonds & atoms ---- */
+.nme__bond {
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.nme__ring {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 2.5;
+}
+
+.nme__hub {
+  fill: var(--ink);
+}
+
+/* Plain atoms (α-hydrogens, spectator groups) sit back in muted ink so the two
+   colour-coded roles — the β-hydrogens and the leaving group — carry the meaning
+   and the projection stays calm at mobile width. */
+.nme__atom {
+  fill: var(--text);
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  user-select: none;
+}
+
+/* the leaving group — a structural cue, not the answer */
+.nme__atom.is-lg {
+  fill: var(--spark);
+}
+
+/* β-hydrogens are marked so the learner knows which are in play */
+.nme__atom.is-beta {
+  fill: var(--sky);
+}
+
+.nme__atom.is-armed {
+  fill: var(--grow);
+}
+
+/* affordance ring on the β-H the base can currently reach */
+.nme__beta-ready {
+  fill: var(--grow-bg);
+  stroke: var(--grow);
+  stroke-width: 1.6;
+  stroke-dasharray: 2 3;
+  animation: nme-pulse 1.4s ease-in-out infinite;
+}
+
+/* ---- base ion ---- */
+.nme__base circle {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.nme__base text {
+  fill: var(--accent-ink);
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  user-select: none;
+}
+.nme__base {
+  cursor: pointer;
+}
+.nme__base.is-armed circle {
+  fill: var(--grow-bg);
+  stroke: var(--grow);
+  stroke-width: 2.4;
+  animation: nme-pulse 1.2s ease-in-out infinite;
+}
+.nme__base.is-armed text {
+  fill: var(--grow);
+}
+.nme__base.is-bounce {
+  animation: nme-bounce 0.45s ease;
+}
+
+/* ---- rotation track + spin hint ---- */
+.nme__track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.2;
+  stroke-dasharray: 2 6;
+  opacity: 0.7;
+}
+.nme__spinhint {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  opacity: 0.7;
+  animation: nme-pulse 1.8s ease-in-out infinite;
+}
+
+/* visible "grab here to rotate" grip on the back-ring rim — it turns with the
+   ring so the spin affordance survives past the first-time hint */
+.nme__grip {
+  pointer-events: none;
+}
+.nme__grip circle {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+.nme__grip line {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.nme__grip.is-hint circle {
+  animation: nme-pulse 1.8s ease-in-out infinite;
+}
+
+/* drag handle — invisible but grabs pointer events (drag anywhere) */
+.nme__spinner {
+  fill: transparent;
+  cursor: grab;
+}
+.nme__spinner:active {
+  cursor: grabbing;
+}
+
+/* ---- arrows ---- */
+.nme__arrow {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nme-arrow-in 0.3s ease both;
+}
+.nme__arrowhead {
+  fill: var(--accent);
+}
+
+/* ---- crossfade Newman -> product ---- */
+.nme__newman {
+  transition: opacity 0.4s ease;
+}
+.nme__product {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.nme.phase-done .nme__newman {
+  opacity: 0;
+}
+.nme.phase-done .nme__product {
+  opacity: 1;
+}
+.nme.phase-done .nme__base {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.nme__pi {
+  stroke: var(--ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.nme__leaving {
+  fill: var(--spark);
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ---- legend ---- */
+.nme__legend {
+  display: flex;
+  justify-content: center;
+  margin-top: -0.1rem;
+  transition: opacity 0.4s ease;
+}
+.nme__legend-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text);
+}
+/* swatch echoes the β-hydrogen atom colour */
+.nme__legend-key::before {
+  content: '';
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--sky-bg);
+  border: 1.5px solid var(--sky);
+}
+.nme.phase-done .nme__legend {
+  opacity: 0;
+}
+
+/* ---- controls + status ---- */
+.nme__controls {
+  display: flex;
+  justify-content: center;
+}
+.nme__btn {
+  padding: 9px 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: var(--display);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.15s, transform 0.05s, opacity 0.15s;
+}
+.nme__btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.nme__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.nme__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.nme__status {
+  min-height: 1.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+  max-width: 340px;
+  line-height: 1.4;
+}
+.nme__note {
+  color: var(--text);
+}
+.nme__ready {
+  color: var(--grow);
+  font-weight: 700;
+}
+.nme__flash {
+  color: var(--flag);
+  font-weight: 600;
+}
+.nme__done {
+  color: var(--grow);
+  font-weight: 700;
+}
+
+@keyframes nme-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes nme-bounce {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes nme-arrow-in {
+  from {
+    opacity: 0;
+    stroke-width: 0.5;
+  }
+  to {
+    opacity: 1;
+    stroke-width: 2.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nme__beta-ready,
+  .nme__spinhint,
+  .nme__grip.is-hint circle,
+  .nme__base.is-armed circle,
+  .nme__arrow,
+  .nme__base.is-bounce {
+    animation: none;
+  }
+}

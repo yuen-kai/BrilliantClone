@@ -1,0 +1,142 @@
+.mcanvas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.mcanvas__svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  aspect-ratio: 320 / 220;
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+  touch-action: none;
+}
+
+.mcanvas__bond line {
+  stroke: var(--ink, #16142b);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* the σ bond that forms on solve (the product) — draws itself in, in success green */
+.mcanvas__bond--new line {
+  stroke: var(--grow, #0fa968);
+  stroke-dasharray: 140;
+  stroke-dashoffset: 140;
+  animation: mcanvas-bond-draw 0.55s ease 0.05s forwards;
+}
+@keyframes mcanvas-bond-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.mcanvas__label {
+  fill: var(--ink, #16142b);
+  font-family: var(--display, system-ui, sans-serif);
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.mcanvas__charge {
+  fill: var(--flag, #d8553a);
+  font-size: 13px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+
+.mcanvas__lone circle {
+  fill: var(--accent, #6c63ff);
+}
+
+/* electron-source handle: a grabbable ring wrapping the two electrons (a pair),
+   so it reads as "grab these electrons" instead of an empty dashed target. */
+.mcanvas__tail {
+  cursor: grab;
+}
+.mcanvas__tail.is-active {
+  cursor: grabbing;
+}
+.mcanvas__tail-ring {
+  fill: color-mix(in srgb, var(--accent, #6c63ff) 12%, transparent);
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  animation: mcanvas-pulse 2.4s ease-in-out infinite;
+}
+.mcanvas__tail-dot {
+  fill: var(--accent, #6c63ff);
+  pointer-events: none;
+}
+.mcanvas__tail:hover .mcanvas__tail-ring,
+.mcanvas__tail.is-active .mcanvas__tail-ring {
+  fill: color-mix(in srgb, var(--accent, #6c63ff) 30%, transparent);
+  stroke-dasharray: none;
+}
+
+/* the ring breathes; the electron dots stay solid so they always read clearly */
+@keyframes mcanvas-pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.mcanvas__head-target {
+  fill: color-mix(in srgb, var(--grow, #34c77b) 18%, transparent);
+  stroke: var(--grow, #34c77b);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 3;
+}
+
+.mcanvas__arrow {
+  fill: none;
+  stroke: var(--accent, #6c63ff);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.mcanvas__arrow--ghost {
+  stroke-dasharray: 5 4;
+  opacity: 0.8;
+}
+.mcanvas__arrowhead {
+  fill: var(--accent, #6c63ff);
+}
+
+.mcanvas__atom--leaving {
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+.mcanvas.is-solved .mcanvas__atom--leaving {
+  transform: translate(26px, 18px);
+  opacity: 0.35;
+}
+.mcanvas.is-solved .mcanvas__tail {
+  display: none;
+}
+
+.mcanvas__status {
+  min-height: 1.4rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+.mcanvas__note {
+  color: var(--mono-soft, #6b6b73);
+}
+.mcanvas__flash {
+  color: var(--flag, #d8553a);
+  font-weight: 600;
+}
+.mcanvas__done {
+  color: var(--grow, #2e9b63);
+  font-weight: 700;
+}

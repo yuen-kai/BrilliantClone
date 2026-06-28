@@ -75,12 +75,12 @@ export const lesson4: Lesson = {
       step: 3,
       type: 'teach-back',
       concept: 'casework',
+      problem:
+        'A prize is either a book (5 books) OR a game bundle (2 consoles × 3 games). How many possible prizes are there?',
       prompt:
-        "You're the teacher now. Explain how casework works in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'Split the problem into cases that don’t overlap and together cover everything',
-        'Count each case on its own',
-        'Multiply the choices within a single case',
+        'Count each separate case on its own',
         'Add the case counts together for the total',
       ],
     },

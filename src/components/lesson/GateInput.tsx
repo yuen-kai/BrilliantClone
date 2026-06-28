@@ -77,7 +77,7 @@ export function GateInput({
     } else if (res.error !== 'empty') {
       setErrored(true)
       setMessage(
-        res.error === 'locked' ? res.message : "Couldn't read that — try a number or +, −, ×, ÷.",
+        res.error === 'locked' ? res.message : "Couldn't read that — try a number or +, −, ×, ÷, ^.",
       )
       shake(inputRef.current)
       inputRef.current?.focus()

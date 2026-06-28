@@ -1,13 +1,22 @@
-import { Link } from 'react-router-dom'
-import { courseLessons } from '../../content/course'
+import { Link, useNavigate } from 'react-router-dom'
+import type { CourseLesson } from '../../types/lesson'
+import type { Course } from '../../content/courses'
 import { availableLessonIds } from '../../content/lessons'
-import { useAllLessonProgress, clearDemoProgress } from '../../hooks/useLessonProgress'
+import { getCourseTest, courseTestProgressId } from '../../content/courseTests'
+import { getTestStatus, readTestMeta, formatRemaining, type TestPhase } from '../../lib/courseTestState'
+import {
+  useAllLessonProgress,
+  clearDemoProgress,
+  applyCourseDemoState,
+  type CourseDemoState,
+} from '../../hooks/useLessonProgress'
 import { useAuth } from '../../context/AuthContext'
 import './CoursePath.css'
 
 function isLessonUnlocked(
   lessonId: string,
   progressMap: Record<string, { mastered: boolean | null }>,
+  courseLessons: CourseLesson[],
 ): boolean {
   const lesson = courseLessons.find((l) => l.id === lessonId)
   if (!lesson) return false
@@ -35,8 +44,10 @@ function buildCurve(points: { x: number; y: number }[]): string {
   return d
 }
 
-export function CoursePath() {
-  const { displayName, logOut, isConfigured, user, demoMode } = useAuth()
+export function CoursePath({ course }: { course: Course }) {
+  const courseLessons = course.lessons
+  const navigate = useNavigate()
+  const { displayName, logOut, isConfigured, user, demoMode, aiEnabled, setAiEnabled } = useAuth()
   const { progressMap, streak, loading } = useAllLessonProgress()
 
   const handleExit = () => {
@@ -45,7 +56,7 @@ export function CoursePath() {
   }
 
   const recommendedId = courseLessons.find(
-    (l) => isLessonUnlocked(l.id, progressMap) && progressMap[l.id]?.mastered !== true,
+    (l) => isLessonUnlocked(l.id, progressMap, courseLessons) && progressMap[l.id]?.mastered !== true,
   )?.id
 
   const masteredCount = courseLessons.filter((l) => progressMap[l.id]?.mastered === true).length
@@ -54,16 +65,16 @@ export function CoursePath() {
 
   const heading =
     masteredCount === 0
-      ? "Let's count something."
+      ? course.tagline
       : masteredCount === total
-        ? 'Path complete. You counted it all.'
+        ? 'Path complete. Nicely done.'
         : `${total - masteredCount} to go, keep the momentum.`
   const cheer = displayName
     ? `${displayName}, ${heading.charAt(0).toLowerCase()}${heading.slice(1)}`
     : heading
 
   const nodes = courseLessons.map((lesson, i) => {
-    const unlocked = isLessonUnlocked(lesson.id, progressMap)
+    const unlocked = isLessonUnlocked(lesson.id, progressMap, courseLessons)
     const progress = progressMap[lesson.id]
     const mastered = progress?.mastered === true
     const started = (progress?.currentStepIndex ?? 0) > 0 && !mastered
@@ -91,13 +102,58 @@ export function CoursePath() {
     }
   })
 
-  const goalY = TOP_PAD + total * STEP_Y
+  // A mixed end-of-course test sits after the last lesson. It unlocks once every
+  // lesson is mastered, primes the course on the first pass, then withholds a
+  // retest for two days (spaced repetition).
+  const test = getCourseTest(course.id)
+  const allMastered = total > 0 && masteredCount === total
+  const testStatus = getTestStatus(
+    allMastered,
+    readTestMeta(progressMap[courseTestProgressId(course.id)]?.stepAnswers),
+  )
+  const testTappable =
+    testStatus.phase === 'available' || testStatus.phase === 'retest' || testStatus.phase === 'reinforced'
+  const testCoin =
+    testStatus.phase === 'reinforced'
+      ? 'mastered'
+      : testStatus.phase === 'available' || testStatus.phase === 'retest'
+        ? 'active'
+        : testStatus.phase === 'primed'
+          ? 'soon'
+          : 'locked'
+  const testStatusText =
+    testStatus.phase === 'reinforced'
+      ? 'Reinforced'
+      : testStatus.phase === 'retest'
+        ? 'Retest ready'
+        : testStatus.phase === 'primed'
+          ? `Primed · retest in ${formatRemaining((testStatus.retestAt ?? Date.now()) - Date.now())}`
+          : testStatus.phase === 'available'
+            ? 'Mix of the whole course'
+            : 'Finish all lessons first'
+  const demoState: CourseDemoState =
+    testStatus.phase === 'reinforced'
+      ? 'completion'
+      : testStatus.phase === 'primed' || testStatus.phase === 'retest'
+        ? 'primed'
+        : 'uncompleted'
+  const testX = WEAVE[total % WEAVE.length]
+  const testY = TOP_PAD + total * STEP_Y
+
+  const goalY = TOP_PAD + (total + (test ? 1 : 0)) * STEP_Y
   const trailHeight = goalY + 76
-  const curve = buildCurve([...nodes.map((n) => ({ x: n.x, y: n.y })), { x: 28, y: goalY }])
+  const curve = buildCurve([
+    ...nodes.map((n) => ({ x: n.x, y: n.y })),
+    ...(test ? [{ x: testX, y: testY }] : []),
+    { x: 28, y: goalY },
+  ])
 
   return (
     <div className="course-path">
       <aside className="course-card">
+        <Link to="/course" className="course-path__all">
+          ← All courses
+        </Link>
         <div className="course-card__top">
           <BrandMark />
           {((isConfigured && user) || demoMode) && (
@@ -107,8 +163,8 @@ export function CoursePath() {
           )}
         </div>
 
-        <span className="course-path__level">Combinatorics · Level 1</span>
-        <h1 className="course-path__title">Counting Strategies</h1>
+        <span className="course-path__level">{course.level}</span>
+        <h1 className="course-path__title">{course.title}</h1>
         <p className="course-path__cheer">{cheer}</p>
 
         <div className="course-card__progress" aria-label={`${pct} percent of the course complete`}>
@@ -138,6 +194,55 @@ export function CoursePath() {
             <span className="tile__label">Day streak</span>
           </div>
         </div>
+
+        {demoMode && (
+          <div className="course-path__demo" role="group" aria-label="Demo controls">
+            <span className="course-path__demo-label">Demo state</span>
+            <div className="course-path__demo-seg">
+              {(['uncompleted', 'primed', 'completion'] as CourseDemoState[]).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`course-path__demo-btn ${demoState === s ? 'is-on' : ''}`}
+                  onClick={() => {
+                    applyCourseDemoState(
+                      course.id,
+                      courseLessons.map((l) => l.id),
+                      s,
+                    )
+                    // Primed/completion deep-link into the reward screen so the
+                    // animation plays; uncompleted just refreshes the path.
+                    if (s === 'primed') navigate(`/course/${course.id}/test?reward=primed`)
+                    else if (s === 'completion') navigate(`/course/${course.id}/test?reward=reinforced`)
+                    else window.location.reload()
+                  }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <span className="course-path__demo-label">AI tutor</span>
+            <div className="course-path__demo-seg">
+              <button
+                type="button"
+                className={`course-path__demo-btn ${aiEnabled ? 'is-on' : ''}`}
+                aria-pressed={aiEnabled}
+                onClick={() => setAiEnabled(true)}
+              >
+                on
+              </button>
+              <button
+                type="button"
+                className={`course-path__demo-btn ${!aiEnabled ? 'is-on' : ''}`}
+                aria-pressed={!aiEnabled}
+                onClick={() => setAiEnabled(false)}
+              >
+                off
+              </button>
+            </div>
+          </div>
+        )}
       </aside>
 
       <section className="trail-panel">
@@ -188,9 +293,34 @@ export function CoursePath() {
             </div>
           ))}
 
+          {test && (
+            <div
+              className={`stop stop--${testCoin}`}
+              style={{ left: `${testX}%`, top: testY, ['--i' as string]: total }}
+            >
+              {testTappable ? (
+                <Link to={`/course/${course.id}/test`} className="coin-wrap">
+                  <span className={`coin coin--${testCoin}`}>
+                    <TestCoinIcon phase={testStatus.phase} />
+                  </span>
+                </Link>
+              ) : (
+                <div className="coin-wrap coin-wrap--static">
+                  <span className={`coin coin--${testCoin}`}>
+                    <TestCoinIcon phase={testStatus.phase} />
+                  </span>
+                </div>
+              )}
+              <div className="stop__label">
+                <span className="stop__lesson-title">Course test</span>
+                <span className={`stop__status stop__status--${testCoin}`}>{testStatusText}</span>
+              </div>
+            </div>
+          )}
+
           <div
             className="stop stop--goal"
-            style={{ left: '28%', top: goalY, ['--i' as string]: total }}
+            style={{ left: '28%', top: goalY, ['--i' as string]: total + (test ? 1 : 0) }}
           >
             <div className="coin-wrap coin-wrap--static">
               <span className="coin coin--goal">
@@ -300,6 +430,49 @@ function SparkIcon() {
       />
     </svg>
   )
+}
+
+function TestIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M9 2a1 1 0 0 0-1 1H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1a1 1 0 0 0-1-1H9Zm0 2h6v2H9V4Z"
+      />
+      <path
+        fill="none"
+        stroke="var(--surface, #fff)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M8.5 13.5l2 2 4-4.5"
+      />
+    </svg>
+  )
+}
+
+function ClockIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M12 7v5l3.5 2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function TestCoinIcon({ phase }: { phase: TestPhase }) {
+  if (phase === 'primed') return <ClockIcon />
+  if (phase === 'locked') return <LockIcon />
+  // available, retest, and reinforced all keep the test icon; the coin color
+  // (active purple vs mastered green) is what marks a passed test from a fresh one.
+  return <TestIcon />
 }
 
 function TrophyIcon() {

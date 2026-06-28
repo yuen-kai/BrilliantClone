@@ -1,0 +1,266 @@
+.bsa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.bsa__svg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* bonds */
+.bsa__bond {
+  stroke: var(--border-strong);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+.bsa__bond--nu {
+  stroke: var(--grow);
+  stroke-width: 4;
+}
+
+/* reaction axis + backside cone */
+.bsa__axis {
+  stroke: var(--border-strong);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 5;
+  opacity: 0.7;
+}
+.bsa__cone {
+  stroke: var(--accent);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 4;
+  opacity: 0.4;
+}
+
+/* the open backside lobe — turns inviting / forbidding as you aim */
+.bsa__lobe {
+  fill: color-mix(in srgb, var(--accent) 16%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 3;
+  transition: fill 0.15s ease, stroke 0.15s ease, rx 0.3s ease, ry 0.3s ease;
+}
+.bsa__lobe.is-target {
+  fill: color-mix(in srgb, var(--grow) 30%, transparent);
+  stroke: var(--grow);
+}
+.bsa__lobe.is-bad {
+  fill: color-mix(in srgb, var(--flag) 22%, transparent);
+  stroke: var(--flag);
+}
+.bsa__lobe.is-closed {
+  fill: color-mix(in srgb, var(--flag) 30%, transparent);
+  stroke: var(--flag);
+  stroke-dasharray: 1 0;
+}
+
+/* substituent end caps */
+.bsa__group {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.bsa__bulk {
+  fill: color-mix(in srgb, var(--ink) 12%, transparent);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  transition: r 0.3s ease;
+}
+.bsa__glabel {
+  fill: var(--text-h);
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 13px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* central carbon (electrophile) */
+.bsa__c-bg {
+  fill: var(--sky-bg);
+  stroke: var(--sky);
+  stroke-width: 1.5;
+}
+.bsa__c {
+  fill: var(--ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.bsa__delta {
+  fill: var(--sky);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+/* leaving group */
+.bsa__lg-bg {
+  fill: var(--ember-bg);
+  stroke: var(--ember);
+  stroke-width: 1.5;
+}
+.bsa__lglabel {
+  fill: var(--ember);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.bsa__charge {
+  fill: var(--ember);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 15px;
+  text-anchor: middle;
+}
+
+.bsa__rubber {
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-dasharray: 5 4;
+  opacity: 0.6;
+}
+
+/* nucleophile puck */
+.bsa__nu-dot {
+  fill: var(--accent-bg);
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+.bsa__nu-label {
+  fill: var(--accent-ink);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 12px;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.bsa__nu.is-parked {
+  opacity: 0.8;
+}
+.bsa__nu-hit {
+  fill: transparent;
+  cursor: grab;
+}
+.bsa[data-phase='idle'] .bsa__nu-dot {
+  animation: bsa-pulse 2s ease-in-out infinite;
+}
+.bsa[data-phase='idle'] .bsa__nu-hit:active {
+  cursor: grabbing;
+}
+@keyframes bsa-pulse {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* status line */
+.bsa__status {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.bsa__note {
+  font-size: 0.82rem;
+  color: var(--text);
+  max-width: 320px;
+}
+.bsa__flash {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spark);
+  background: var(--spark-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+.bsa__done {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--grow);
+  background: var(--grow-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+/* sterics sub-mode: substrate selector + live rate bar */
+.bsa__sterics {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.bsa__classes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.bsa__class {
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+.bsa__class:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.bsa__class.is-active {
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  background: var(--accent-bg);
+}
+.bsa__rate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.bsa__rate-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.bsa__rate-track {
+  height: 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.bsa__rate-fill {
+  height: 100%;
+  min-width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 65%, var(--grow)));
+  transition: width 0.4s cubic-bezier(0.2, 0.8, 0.3, 1);
+}

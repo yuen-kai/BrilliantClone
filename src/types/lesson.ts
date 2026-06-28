@@ -1,6 +1,7 @@
 import type { HandshakeConnectConfig } from '../components/visuals/HandshakeConnect'
 import type { AnagramBoardConfig } from '../components/visuals/AnagramBoard'
 import type { ComplementTreeConfig } from '../components/visuals/ComplementTree'
+import type { OrgoStep } from './orgo'
 import type { Op } from '../lib/mathExpr'
 
 export type { Op }
@@ -310,8 +311,9 @@ export type ClassifyStep = {
 /**
  * A "teach it back" step that sits right before the final check: the learner
  * plays teacher and explains the concept to the AI, which corrects mistakes
- * against the structured `keyPoints` (never quoting them). It's an AI-only step —
- * when AI is off it's skipped, so the lesson still works as an MVP.
+ * against the structured `keyPoints` (never quoting them). When AI is off the
+ * step becomes an authored self-check: the learner writes their explanation and
+ * grades it against `keyPoints`, so the beat still happens without the tutor.
  */
 export type TeachBackStep = {
   id: string
@@ -319,11 +321,164 @@ export type TeachBackStep = {
   type: 'teach-back'
   /** Short name of what they're teaching, e.g. "the multiplication principle". */
   concept: string
+  /** A concrete, predetermined problem the learner teaches the AI how to solve. */
+  problem: string
   /** Opening line inviting the learner to teach. */
   prompt: string
   /** Structured ideas a sound explanation should cover; the AI checks against
    * these and they double as the end-of-step recap. */
   keyPoints: string[]
+}
+
+/**
+ * A categorical gate: the learner taps one of a few options instead of typing a
+ * number. Used by the chemistry `mechanism` steps where the answer is a choice
+ * ("which is the nucleophile?", "staggered or eclipsed?", "which mechanism?")
+ * rather than a count. Wrong picks get Socratic feedback, optionally per-option.
+ */
+export type ChoiceOption = { id: string; label: string }
+
+export type ChoiceBlank = {
+  id: string
+  label: string
+  prompt: string
+  options: ChoiceOption[]
+  correctId: string
+  /** Default Socratic nudge, plus optional per-wrong-option messages. */
+  feedback: { wrong: string; byOption?: Record<string, string> }
+  hintText?: string
+}
+
+/** A mechanism-step gate is either a numeric blank or a categorical choice.
+ * Discriminate with `'options' in gate`. */
+export type MechanismGate = SolveBlank | ChoiceBlank
+
+// ---------------------------------------------------------------------------
+// Organic-chemistry "mechanism" visuals (Reaction Mechanisms course).
+// Each is a small SVG + pointer-events widget. Configs live here so lesson
+// content and the widgets share one source of truth; widgets import these.
+// ---------------------------------------------------------------------------
+
+/** One atom on a schematic Lewis/skeletal structure. x,y are in a 0–320 stage. */
+export type CanvasAtom = {
+  id: string
+  label: string
+  x: number
+  y: number
+  charge?: number
+  lonePairs?: number
+  role?: 'nucleophile' | 'electrophile' | 'leaving' | 'beta-h' | 'carbon' | 'base'
+}
+
+export type CanvasBond = { id: string; a: string; b: string; order?: 1 | 2 | 3 }
+
+/** A legal place a curved arrow can start (tail, on electrons) or end (head). */
+export type ArrowSite = {
+  id: string
+  kind: 'lone-pair' | 'bond' | 'atom' | 'empty-orbital'
+  on: string
+  x: number
+  y: number
+}
+
+export type CanvasArrow = { tail: string; head: string }
+
+/**
+ * The curved-arrow canvas — the course's through-line (Lessons 1, 3, 5). The
+ * learner drags double-barbed arrows from electron sources to electrophilic
+ * sites; on the correct set the product forms / a leaving group ejects.
+ */
+export type MechanismCanvasConfig = {
+  mode?: 'bond' | 'ionize' | 'attack' | 'fork'
+  atoms: CanvasAtom[]
+  bonds: CanvasBond[]
+  tails: ArrowSite[]
+  heads: ArrowSite[]
+  /** Arrows the learner must draw (order-independent). */
+  solution: CanvasArrow[]
+  /** Alternate head ids that count as the same target (e.g. top/bottom faces
+   * of a planar carbocation → racemization). Maps alt head id → canonical id. */
+  equivalentHeads?: Record<string, string>
+  /** Shown when a wrong/illegal arrow is dropped. */
+  hint?: string
+  caption?: string
+  energyTrace?: 'one-hump' | 'two-hump'
+  /** Bonds drawn when the step is solved — i.e. the product that forms. */
+  formBonds?: CanvasBond[]
+  /** Ids of bonds that break (hidden) once solved. */
+  breakBonds?: string[]
+  /** Formal charge shown on each atom once solved (0 clears it). */
+  chargeAfter?: Record<string, number>
+}
+
+/** SN2 stage: drag the nucleophile to the backside; the centre inverts. */
+export type ReactionStageConfig = {
+  mode: 'attack' | 'concerted' | 'rate'
+  /** Three non-leaving substituents around the carbon (display labels). */
+  groups: [string, string, string]
+  leavingGroup: string
+  nucleophile: string
+  /** Approach cone half-angle (deg) that counts as "backside". Default ~40. */
+  backsideToleranceDeg?: number
+  bulky?: boolean
+  caption?: string
+}
+
+/** E2 Newman: rotate the back carbon to anti-periplanar, then eliminate. */
+export type NewmanEliminateConfig = {
+  leavingGroup: string
+  base: string
+  /** Front-carbon substituents at 12/4/8 o'clock; one is the LG. */
+  front: { label: string; lg?: boolean }[]
+  /** Back-carbon substituents; mark which are removable β-hydrogens. */
+  back: { label: string; betaH?: boolean }[]
+  antiToleranceDeg?: number
+  caption?: string
+}
+
+/** SN1/E1 rate lab: rank carbocation stability + see reaction order. */
+export type RateLabConfig = {
+  substrates: { id: string; label: string; degree: 'methyl' | '1°' | '2°' | '3°'; relRate: number }[]
+  /** Which sliders to show; the nucleophile slider visibly does nothing. */
+  sliders: ('substrate' | 'nucleophile')[]
+  caption?: string
+}
+
+/** L6 reaction console: dial conditions, predict the mechanism + product. */
+export type ReactionConsoleControl = 'substrate' | 'reagent' | 'solvent' | 'heat'
+export type ReactionConsoleConfig = {
+  substrate: { klass: 'methyl' | '1°' | '2°' | '3°'; label: string }
+  controls: ReactionConsoleControl[]
+  reagents?: { id: string; label: string; role: 'strong-nu' | 'strong-bulky-base' | 'strong-small-base' | 'weak-neutral' }[]
+  caption?: string
+}
+
+/** L6 decision tree (repurposed tap-to-grow), used to name the framework. */
+export type MechanismTreeConfig = {
+  caption?: string
+}
+
+export type MechanismVisual =
+  | { component: 'mechanism-canvas'; config: MechanismCanvasConfig }
+  | { component: 'reaction-stage'; config: ReactionStageConfig }
+  | { component: 'newman-eliminate'; config: NewmanEliminateConfig }
+  | { component: 'rate-lab'; config: RateLabConfig }
+  | { component: 'reaction-console'; config: ReactionConsoleConfig }
+  | { component: 'mechanism-tree'; config: MechanismTreeConfig }
+
+/**
+ * The chemistry mechanism step: a manipulable visual the learner drives first,
+ * then gated blanks (numeric or choice) one at a time. With `gateOnSolved`, the
+ * gates stay hidden until the widget reports it's been driven to completion.
+ */
+export type MechanismStep = {
+  id: string
+  step: number
+  type: 'mechanism'
+  prompt: string
+  visual: MechanismVisual
+  gateOnSolved?: boolean
+  gates: MechanismGate[]
 }
 
 export type LessonStep =
@@ -338,6 +493,8 @@ export type LessonStep =
   | StarsBarsSolveStep
   | ClassifyStep
   | TeachBackStep
+  | MechanismStep
+  | OrgoStep
 
 export type Lesson = {
   id: string

@@ -1,7 +1,8 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { isLayerActive } from '../../config/buildLayer'
 import type { Lesson, LessonProgress, Op, VisualInteractiveStep } from '../../types/lesson'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { AllowedOpsContext, allowedOpsForLevel, newlyUnlockedAfterLevel } from './AllowedOpsContext'
 import { VisualInteractiveStepView } from '../steps/VisualInteractiveStep'
 import { RuleStatementStepView } from '../steps/RuleStatementStep'
@@ -13,6 +14,8 @@ import { SlotSelectStepView } from '../steps/SlotSelectStep'
 import { DiscoveryStepView } from '../steps/DiscoveryStep'
 import { CaseworkStepView } from '../steps/CaseworkStep'
 import { ClassifyStepView } from '../steps/ClassifyStep'
+import { MechanismStepView } from '../steps/MechanismStep'
+import { OrgoStepView } from '../steps/OrgoStep'
 import './LessonRunner.css'
 
 // AI-only; lazy so the AI SDK loads only when a learner reaches the teach step.
@@ -25,11 +28,18 @@ type LessonRunnerProps = {
   progress: LessonProgress
   onProgressChange: (progress: LessonProgress) => void
   onLessonStart?: () => void
+  /** Course this lesson belongs to — sets the back/next links. */
+  courseId?: string
+  /** When false, the math operator-unlock ladder + its notice are suppressed
+   * (chemistry lessons don't use ! P C). */
+  mathProgression?: boolean
 }
 
 function stepKindLabel(type: Lesson['steps'][number]['type']): string {
   if (type === 'visual-interactive') return 'Build'
   if (type === 'discovery') return 'Explore'
+  if (type === 'mechanism') return 'Push'
+  if (type === 'orgo') return 'Push'
   if (type === 'casework') return 'Cases'
   if (type === 'classify') return 'Identify'
   if (type === 'rule-statement') return 'Rule'
@@ -76,21 +86,30 @@ export function LessonRunner({
   progress,
   onProgressChange,
   onLessonStart,
+  courseId = 'counting',
+  mathProgression = true,
 }: LessonRunnerProps) {
   const [started, setStarted] = useState(
     progress.currentStepIndex > 0 || progress.mastered !== null || !!progress.completedAt,
   )
   // Which operators the learner may type is fixed by the lesson's level (order),
   // not by what they've completed — so skipping ahead still grants the right ops.
-  // Every gate in the active step reads this via AllowedOpsContext.
-  const allowedOps = useMemo(() => allowedOpsForLevel(lesson.order), [lesson.order])
+  // Every gate in the active step reads this via AllowedOpsContext. Courses
+  // without the math ladder (chemistry) stay on the basic set.
+  const allowedOps = useMemo(
+    () => allowedOpsForLevel(mathProgression ? lesson.order : 1),
+    [lesson.order, mathProgression],
+  )
   // Operators that open up once this level is behind the learner, announced on
-  // the completion screen.
-  const newlyUnlocked = useMemo(() => newlyUnlockedAfterLevel(lesson.order), [lesson.order])
+  // the completion screen (math courses only).
+  const newlyUnlocked = useMemo(
+    () => (mathProgression ? newlyUnlockedAfterLevel(lesson.order) : []),
+    [lesson.order, mathProgression],
+  )
 
-  // The teach-back step is always part of the lesson; it shows an "unavailable"
-  // notice itself when no AI key is configured.
   const steps = lesson.steps
+  const navigate = useNavigate()
+  const coursePath = `/course/${courseId}`
 
   useEffect(() => {
     if (progress.currentStepIndex > 0 || progress.mastered !== null || progress.completedAt) {
@@ -152,6 +171,12 @@ export function LessonRunner({
     [progress, reached, onProgressChange],
   )
 
+  // Enter starts the lesson from the start screen.
+  useEnterKey(handleStart, !started && progress.currentStepIndex === 0)
+  // On the completion screen, Enter goes to the next lesson (the course path).
+  const lessonFinished = progress.currentStepIndex >= steps.length
+  useEnterKey(() => navigate(coursePath), lessonFinished && isLayerActive(4))
+
   if (
     progress.mastered !== null &&
     progress.completedAt &&
@@ -177,7 +202,7 @@ export function LessonRunner({
             Replay lesson
           </button>
           {isLayerActive(4) && (
-            <Link to="/course" className="lesson-runner__course-link">
+            <Link to={coursePath} className="lesson-runner__course-link">
               Next lesson
             </Link>
           )}
@@ -211,7 +236,7 @@ export function LessonRunner({
             Replay lesson
           </button>
           {isLayerActive(4) && (
-            <Link to="/course" className="lesson-runner__course-link">
+            <Link to={coursePath} className="lesson-runner__course-link">
               Next lesson
             </Link>
           )}
@@ -232,7 +257,7 @@ export function LessonRunner({
       <div className="lesson-runner">
       <div className="lesson-runner__topbar">
         {isLayerActive(4) && (
-          <Link to="/course" className="lesson-runner__back-inline">
+            <Link to={coursePath} className="lesson-runner__back-inline">
             ← Course path
           </Link>
         )}
@@ -316,6 +341,18 @@ export function LessonRunner({
           step={currentStep}
           onComplete={handleStepComplete}
         />
+      )}
+
+      {currentStep.type === 'mechanism' && (
+        <MechanismStepView
+          key={currentStep.id}
+          step={currentStep}
+          onComplete={handleStepComplete}
+        />
+      )}
+
+      {currentStep.type === 'orgo' && (
+        <OrgoStepView key={currentStep.id} step={currentStep} onComplete={handleStepComplete} />
       )}
 
       {currentStep.type === 'casework' && (

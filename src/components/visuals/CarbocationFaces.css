@@ -1,0 +1,258 @@
+.cf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.cf__svg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+/* bonds */
+.cf__bond {
+  stroke: var(--border-strong);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+.cf__wedge {
+  fill: var(--border-strong);
+}
+.cf__dash {
+  stroke: var(--border-strong);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.cf__newbond {
+  stroke: var(--grow);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+/* empty p-orbital lobes = the two faces of attack */
+.cf__lobe-shape {
+  fill: var(--sky);
+  fill-opacity: 0.12;
+  stroke: var(--sky);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 3;
+  stroke-opacity: 0.55;
+  transition: fill-opacity 0.15s ease;
+}
+.cf__lobe-ring {
+  fill: none;
+  stroke: var(--sky);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+  opacity: 0.55;
+  transition: r 0.12s ease, opacity 0.15s ease;
+}
+.cf__lobe.is-hover .cf__lobe-shape {
+  fill-opacity: 0.3;
+}
+.cf__lobe.is-hover .cf__lobe-ring {
+  opacity: 1;
+}
+
+/* atoms */
+.cf__disc {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.cf__label {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 15px;
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+.cf__label--sm {
+  font-size: 10.5px;
+}
+
+.cf__atom--carbon .cf__disc {
+  stroke: var(--sky);
+  fill: var(--sky-bg);
+}
+.cf__atom--group .cf__disc {
+  stroke: var(--border-strong);
+  fill: var(--surface);
+}
+.cf__atom--lg .cf__disc {
+  stroke: var(--ember);
+  fill: var(--ember-bg);
+}
+.cf__atom--nu .cf__disc {
+  stroke: var(--accent);
+  fill: var(--accent-bg);
+}
+
+.cf__atom.is-grab {
+  cursor: grab;
+}
+.cf__atom.is-grab .cf__disc {
+  animation: cf-pulse 1.7s ease-in-out infinite;
+}
+.cf__atom.is-drag {
+  cursor: grabbing;
+}
+@keyframes cf-pulse {
+  0%,
+  100% {
+    stroke-width: 1.5;
+  }
+  50% {
+    stroke-width: 3.4;
+  }
+}
+
+/* charges */
+.cf__charge {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+  pointer-events: none;
+}
+.cf__charge--pos {
+  fill: var(--sky);
+}
+.cf__charge--neg {
+  fill: var(--accent);
+}
+
+/* curved electron arrow + the "pull" affordance */
+.cf__arrow {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.cf__arrowhead {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.cf__pull {
+  stroke: var(--ember);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 5 5;
+  fill: none;
+  animation: cf-tug 1.5s ease-in-out infinite;
+}
+.cf__pull-head {
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+@keyframes cf-tug {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(2px);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+}
+
+/* product-ratio scoreboard */
+.cf__ratio {
+  width: 100%;
+  max-width: 300px;
+}
+.cf__ratio-bar {
+  display: flex;
+  height: 26px;
+  gap: 2px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.cf__ratio-seg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+  transition: width 0.45s ease;
+}
+.cf__ratio-seg--top {
+  background: var(--sky-bg);
+}
+.cf__ratio-seg--bot {
+  background: var(--accent-bg);
+}
+.cf__ratio-tag {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cf__ratio-seg--top .cf__ratio-tag {
+  color: var(--sky);
+}
+.cf__ratio-seg--bot .cf__ratio-tag {
+  color: var(--accent);
+}
+.cf__ratio-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+  padding: 0 2px;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+/* status line */
+.cf__status {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.cf__note {
+  font-size: 0.82rem;
+  color: var(--text);
+  max-width: 320px;
+}
+.cf__flash {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spark);
+  background: var(--spark-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+.cf__done {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--grow);
+  background: var(--grow-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cf__atom.is-grab .cf__disc,
+  .cf__pull {
+    animation: none;
+  }
+}

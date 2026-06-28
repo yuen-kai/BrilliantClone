@@ -1,0 +1,188 @@
+.ap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.ap__svg {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  touch-action: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.ap__bond {
+  stroke: var(--border-strong);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: opacity 0.5s ease;
+}
+.ap__bond.is-breaking {
+  opacity: 0;
+}
+.ap__bond--new {
+  stroke: var(--grow);
+  stroke-width: 4;
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  animation: ap-draw 0.55s ease forwards;
+}
+@keyframes ap-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ap__atom-disc {
+  fill: var(--surface);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+.ap__atom-label {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  fill: var(--ink);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.ap__atom--nucleophile .ap__atom-disc {
+  stroke: var(--accent);
+  fill: var(--accent-bg);
+}
+.ap__atom--electrophile .ap__atom-disc {
+  stroke: var(--sky);
+  fill: var(--sky-bg);
+}
+.ap__atom--leaving .ap__atom-disc {
+  stroke: var(--ember);
+  fill: var(--ember-bg);
+}
+.ap__atom.is-leaving {
+  transition: transform 0.7s ease, opacity 0.7s ease;
+  transform: translate(20px, -18px);
+  opacity: 0.85;
+}
+
+.ap__lp circle {
+  fill: var(--accent);
+}
+
+.ap__delta {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--sky);
+  text-anchor: middle;
+}
+.ap__atom--nucleophile .ap__delta {
+  fill: var(--accent);
+}
+.ap__charge {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+.ap__charge--neg {
+  fill: var(--accent);
+}
+.ap__charge--pos {
+  fill: var(--sky);
+}
+
+.ap__arrow {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: ap-draw 0.4s ease forwards;
+}
+.ap__arrowhead {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ap__rubber {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 6 7;
+  opacity: 0.85;
+}
+
+.ap__tail {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 2;
+  cursor: grab;
+  animation: ap-pulse 1.8s ease-in-out infinite;
+}
+.ap__tail:active {
+  cursor: grabbing;
+}
+.ap__tail.is-used {
+  display: none;
+}
+@keyframes ap-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.ap__head {
+  fill: none;
+  stroke: var(--sky);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+  opacity: 0;
+  transition: opacity 0.15s, r 0.12s;
+}
+.ap__head.is-armed {
+  opacity: 0.6;
+}
+.ap__head.is-hover {
+  opacity: 1;
+  fill: var(--sky-bg);
+}
+
+.ap__status {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+.ap__note {
+  font-size: 0.82rem;
+  color: var(--text);
+  max-width: 320px;
+}
+.ap__flash {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--spark);
+  background: var(--spark-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+.ap__done {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--grow);
+  background: var(--grow-bg);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}

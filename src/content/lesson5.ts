@@ -136,12 +136,12 @@ export const lesson5: Lesson = {
       step: 4,
       type: 'teach-back',
       concept: 'complementary counting',
+      problem:
+        'A 4-question true/false quiz: how many answer keys have at least one True?',
       prompt:
-        "You're the teacher now. Explain complementary counting in your own words — I'll point out anything to fix before your final check.",
+        "You're the teacher now — walk me through how you'd solve this, step by step. I'll nudge you if you miss anything.",
       keyPoints: [
-        'It’s easiest when counting what you want directly is messy, like “at least one”',
-        'Count the total number of outcomes',
-        'Count the unwanted outcomes (the complement)',
+        'Count the total, then count the unwanted outcomes',
         'Subtract to get the answer: wanted = total − unwanted',
       ],
     },

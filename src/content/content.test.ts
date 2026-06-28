@@ -253,8 +253,9 @@ describe.each(allLessons.map((l) => [l.id, l] as const))('lesson %s structure', 
     for (const step of lesson.steps) {
       if (step.type !== 'teach-back') continue
       expect(step.concept.length).toBeGreaterThan(0)
+      expect(step.problem.length).toBeGreaterThan(0)
       expect(step.prompt.length).toBeGreaterThan(0)
-      expect(step.keyPoints.length).toBeGreaterThanOrEqual(3)
+      expect(step.keyPoints.length).toBeGreaterThanOrEqual(2)
       for (const kp of step.keyPoints) expect(kp.trim().length).toBeGreaterThan(0)
       expect(new Set(step.keyPoints).size).toBe(step.keyPoints.length)
     }

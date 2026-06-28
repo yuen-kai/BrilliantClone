@@ -1,4 +1,5 @@
 import type { RuleStatementStep, VisualInteractiveStep } from '../../types/lesson'
+import { useEnterKey } from '../../hooks/useEnterKey'
 import { TreeBuild } from '../tree/TreeBuild'
 import './RuleStatementStep.css'
 
@@ -14,6 +15,7 @@ export function RuleStatementStepView({
   onComplete,
 }: RuleStatementStepProps) {
   const levels = referenceStep?.visual.treeConfig.levels
+  useEnterKey(onComplete)
 
   return (
     <div className="rule-step">

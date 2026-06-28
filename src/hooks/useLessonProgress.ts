@@ -79,6 +79,57 @@ export function clearDemoProgress() {
   }
 }
 
+export type CourseDemoState = 'uncompleted' | 'primed' | 'completion'
+
+/**
+ * Demo-only: force one course into a milestone state so the priming / reward
+ * flow can be inspected without playing through.
+ *   - uncompleted: clears the course's lessons + course-test progress
+ *   - primed:      all lessons mastered + course test just passed (cooldown)
+ *   - completion:  all lessons mastered + course test reinforced (retest passed)
+ */
+export function applyCourseDemoState(
+  courseId: string,
+  lessonIds: string[],
+  state: CourseDemoState,
+) {
+  const now = new Date().toISOString()
+  const testId = `${courseId}-test`
+
+  if (state === 'uncompleted') {
+    for (const id of [...lessonIds, testId]) {
+      try {
+        localStorage.removeItem(`${LOCAL_KEY}-${id}`)
+      } catch {
+        /* ignore */
+      }
+    }
+    return
+  }
+
+  for (const id of lessonIds) {
+    saveLocalProgress(id, {
+      currentStepIndex: 0,
+      stepAnswers: {},
+      mastered: true,
+      completedAt: now,
+      furthestStepIndex: 0,
+    })
+  }
+
+  const stepAnswers =
+    state === 'primed'
+      ? { primedAt: now }
+      : { primedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), retestedAt: now }
+  saveLocalProgress(testId, {
+    currentStepIndex: 0,
+    stepAnswers,
+    mastered: true,
+    completedAt: now,
+    furthestStepIndex: 0,
+  })
+}
+
 export function useLessonProgress(lessonId: string) {
   const { user } = useAuth()
   const [progress, setProgress] = useState<LessonProgress>(() =>

@@ -9,7 +9,7 @@ export function LoginPage() {
   const { logIn, signUp, logInWithGoogle, user, isConfigured, enterDemo } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: string } | null)?.from ?? '/'
+  const from = (location.state as { from?: string } | null)?.from ?? '/course'
 
   const handleDemo = () => {
     seedDemoProgress()

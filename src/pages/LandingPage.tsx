@@ -1,16 +1,8 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { courseLessons } from '../content/course'
+import { courses } from '../content/courses'
+import { useAuth } from '../context/AuthContext'
 import './LandingPage.css'
-
-const TOPIC_BLURBS: Record<string, string> = {
-  'lesson-1': 'Count choices in a row by multiplying.',
-  'lesson-2': 'Arrange and pick, with and without order.',
-  'lesson-3': 'Spot the repeats and divide them out.',
-  'lesson-4': 'Split a hard count into clean cases.',
-  'lesson-5': "Count what you don't want, then subtract.",
-  'lesson-6': 'Share identical things into groups.',
-}
 
 const HOW_IT_WORKS = [
   { lead: 'Build the rule.', rest: 'You derive each formula step by step.' },
@@ -19,6 +11,9 @@ const HOW_IT_WORKS = [
 ]
 
 export function LandingPage() {
+  const { user, demoMode } = useAuth()
+  const ctaTo = user || demoMode ? '/course' : '/login'
+
   return (
     <main className="landing">
       <section className="landing__hero">
@@ -29,8 +24,8 @@ export function LandingPage() {
             Six short lessons on counting the ways things can happen. You build each rule yourself
             and get feedback on every step.
           </p>
-          <Link to="/course" className="landing__cta">
-            Start the course
+          <Link to={ctaTo} className="landing__cta">
+            Start counting
             <Arrow />
           </Link>
         </div>
@@ -40,33 +35,32 @@ export function LandingPage() {
 
       <section className="landing__section landing__topics" aria-labelledby="topics-heading">
         <h2 id="topics-heading" className="landing__section-title">
-          The path
+          Courses
         </h2>
-        <ol className="landing__topic-grid">
-          {courseLessons.map((lesson) => (
-            <li key={lesson.id}>
-              <Link to="/course" className="topic">
-                <span className="topic__num">{String(lesson.order).padStart(2, '0')}</span>
-                <span className="topic__body">
-                  <span className="topic__title">{lesson.title}</span>
-                  <span className="topic__desc">{TOPIC_BLURBS[lesson.id]}</span>
+        <ul className="landing__topic-grid">
+          {courses.map((course) => (
+            <li key={course.id}>
+              <Link to={`/course/${course.id}`} className="topic">
+                <span className="topic__title">{course.title}</span>
+                <span className="topic__desc">
+                  {course.level} · {course.lessons.length} lessons
                 </span>
               </Link>
             </li>
           ))}
-        </ol>
+        </ul>
       </section>
 
       <section className="landing__section landing__how" aria-labelledby="how-heading">
         <h2 id="how-heading" className="landing__section-title">
-          How it works
+          How a lesson works
         </h2>
-        <ol className="landing__how-grid">
+        <ol className="landing__how-list">
           {HOW_IT_WORKS.map((point, i) => (
-            <li key={point.lead} className="howcard">
-              <span className="howcard__step">{i + 1}</span>
-              <p className="howcard__text">
-                <strong className="howcard__lead">{point.lead}</strong> {point.rest}
+            <li key={point.lead} className="howstep">
+              <span className="howstep__n">{i + 1}</span>
+              <p className="howstep__text">
+                <strong className="howstep__lead">{point.lead}</strong> {point.rest}
               </p>
             </li>
           ))}

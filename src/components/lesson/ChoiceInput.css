@@ -1,0 +1,37 @@
+.choice-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.choice-input__btn {
+  flex: 1 1 auto;
+  min-width: 7rem;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid var(--border, rgba(0, 0, 0, 0.14));
+  border-radius: 12px;
+  background: var(--surface, #fff);
+  color: var(--mono, #1b1b1f);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.08s ease;
+}
+
+.choice-input__btn:hover:not(:disabled) {
+  border-color: var(--accent, #6c63ff);
+  background: color-mix(in srgb, var(--accent, #6c63ff) 8%, var(--surface, #fff));
+}
+
+.choice-input__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.choice-input__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

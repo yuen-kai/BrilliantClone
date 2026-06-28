@@ -9,15 +9,18 @@ const step: TeachBackStep = {
   step: 5,
   type: 'teach-back',
   concept: 'the multiplication principle',
-  prompt: 'Teach me the multiplication principle.',
+  problem: 'A sandwich has 3 breads and 2 fillings — how many sandwiches?',
+  prompt: 'Teach me how you’d solve this.',
   keyPoints: ['idea one', 'idea two'],
 }
 
-// Keep the real scoreCoverage; stub the network call and force the configured path.
+// Keep the real scoreCoverage; stub the network call.
 vi.mock('../../services/teachBack', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../services/teachBack')>()
-  return { ...actual, assessTeaching: vi.fn(), isAiConfigured: true }
+  return { ...actual, assessTeaching: vi.fn() }
 })
+// Force the live-tutor path on.
+vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ aiEnabled: true }) }))
 import { assessTeaching } from '../../services/teachBack'
 
 describe('TeachBackStep', () => {
@@ -25,12 +28,36 @@ describe('TeachBackStep', () => {
     ;(assessTeaching as Mock).mockReset()
   })
 
-  it('opens with the prompt and a teach button (no continue yet)', () => {
+  it('shows the problem, a teach button, and always-available escape hatches', () => {
     render(<TeachBackStepView step={step} onComplete={vi.fn()} />)
-    expect(screen.getByText('Teach me the multiplication principle.')).toBeInTheDocument()
+    expect(screen.getByText(step.problem)).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/teach the idea/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Teach the AI' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Continue to the check/ })).toBeNull()
+    // The learner is never trapped: "I'm stuck" and Continue are there from the start.
+    expect(screen.getByRole('button', { name: /I.?m stuck/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Continue to the check/ })).toBeInTheDocument()
+  })
+
+  it('asks the tutor to explain when the learner clicks "I’m stuck"', async () => {
+    ;(assessTeaching as Mock).mockResolvedValue({
+      correct: [],
+      corrections: [],
+      message: 'No problem — here’s the idea: you multiply the options at each step.',
+      solid: false,
+    })
+    render(<TeachBackStepView step={step} onComplete={vi.fn()} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /I.?m stuck/i }))
+
+    expect(assessTeaching).toHaveBeenCalledTimes(1)
+    expect(await screen.findByText(/here.s the idea/i)).toBeInTheDocument()
+  })
+
+  it('lets the learner continue immediately without engaging', async () => {
+    const onComplete = vi.fn()
+    render(<TeachBackStepView step={step} onComplete={onComplete} />)
+    await userEvent.click(screen.getByRole('button', { name: /Continue to the check/ }))
+    expect(onComplete).toHaveBeenCalledTimes(1)
   })
 
   it('shows the AI correction and surfaces fixes when the explanation is incomplete', async () => {

@@ -46,6 +46,44 @@ describe('evaluateExpression — factorial, C, P', () => {
   })
 })
 
+describe('evaluateExpression — power (^)', () => {
+  it('raises to a power', () => {
+    expect(value('2^4')).toBe(16)
+    expect(value('5^0')).toBe(1)
+  })
+
+  it('binds tighter than × ÷ and unary minus', () => {
+    expect(value('2*2^3')).toBe(16)
+    expect(value('2+3^2')).toBe(11)
+    expect(value('-2^2')).toBe(-4)
+  })
+
+  it('is right-associative', () => {
+    expect(value('2^3^2')).toBe(512)
+  })
+
+  it('allows a negative exponent', () => {
+    expect(value('2^-1')).toBe(0.5)
+  })
+
+  it('combines with other operations', () => {
+    expect(value('2^4-1')).toBe(15)
+    expect(value('(1+1)^4')).toBe(16)
+  })
+
+  it('tracks ^ in opsUsed and gates it', () => {
+    const r = evaluateExpression('2^3')
+    expect(r.ok).toBe(true)
+    if (r.ok) expect(r.opsUsed.has('^')).toBe(true)
+    expect(value('2^3', new Set<Op>(['^']))).toBe(8)
+    expect(evaluateExpression('2^3', new Set<Op>())).toMatchObject({
+      ok: false,
+      error: 'locked',
+      lockedOp: '^',
+    })
+  })
+})
+
 describe('evaluateExpression — typographic aliases', () => {
   it('accepts ×, ÷ and the unicode minus', () => {
     expect(value('6 × 5 ÷ 2')).toBe(15)
@@ -134,6 +172,11 @@ describe('exprToLatex — best-effort, never throws', () => {
 
   it('renders factorial', () => {
     expect(exprToLatex('5!')).toBe('5!')
+  })
+
+  it('renders powers as superscripts', () => {
+    expect(exprToLatex('2^3')).toBe('2^{3}')
+    expect(exprToLatex('(2+3)^2')).toContain('^{2}')
   })
 
   it('does not throw on malformed input', () => {
